@@ -26,7 +26,7 @@
                 <DatePicker Name="FromDatePicker"/>
                 <Label Content="Дата до:"/>
                 <DatePicker Name="ToDatePicker"/>
-                <Button Content="Сформировать отчет" Margin="0,10,0,0"/>
+                <Button Content="Сгенерировать отчет" Margin="0,10,0,0"/>
             </StackPanel>
 
             <Label Grid.Row="1" Content="Скачанные файлы:" Margin="0,10,0,5"/>
@@ -43,7 +43,7 @@
 
         <!-- Right Panel for PDF Preview -->
         <DockPanel Grid.Column="2">
-            <Label DockPanel.Dock="Top" Content="Предпросмотр:" />
+            <Label DockPanel.Dock="Top" Content="Предпросмотр (PDF):" />
             <Border BorderBrush="Gray" BorderThickness="1">
                 <DocumentViewer Name="PdfViewer"/>
             </Border>
