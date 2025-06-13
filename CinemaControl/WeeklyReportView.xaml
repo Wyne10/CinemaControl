@@ -14,25 +14,29 @@
         </Grid.ColumnDefinitions>
 
         <!-- Left Panel for Controls -->
-        <DockPanel Grid.Column="0">
-            <StackPanel DockPanel.Dock="Top" Orientation="Vertical">
+        <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <StackPanel Grid.Row="0" Orientation="Vertical">
                 <Label Content="Дата от:"/>
                 <DatePicker Name="FromDatePicker"/>
                 <Label Content="Дата до:"/>
                 <DatePicker Name="ToDatePicker"/>
                 <Button Content="Сформировать отчет" Margin="0,10,0,0"/>
             </StackPanel>
-            
-            <Label DockPanel.Dock="Top" Content="Скачанные файлы:" Margin="0,10,0,5"/>
-            <ListBox Name="DownloadedFilesListBox" DockPanel.Dock="Top">
+
+            <Label Grid.Row="1" Content="Скачанные файлы:" Margin="0,10,0,5"/>
+            <ListBox Grid.Row="2" Name="DownloadedFilesListBox">
                 <!-- Sample Items -->
                 <ListBoxItem Content="report_2023-10-23.pdf"/>
                 <ListBoxItem Content="report_2023-10-24.pdf"/>
                 <ListBoxItem Content="report_2023-10-25.pdf"/>
             </ListBox>
-
-            <Button Content="Открыть выбранный файл" DockPanel.Dock="Bottom" Margin="0,10,0,0"/>
-        </DockPanel>
+        </Grid>
 
         <!-- Grid Splitter -->
         <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" />

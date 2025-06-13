@@ -1,0 +1,39 @@
+<UserControl x:Class="CinemaControl.MonthlyReportView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             xmlns:local="clr-namespace:CinemaControl"
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="800">
+    <Grid Margin="10">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="250"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Left Panel for Controls -->
+        <StackPanel Grid.Column="0" Orientation="Vertical">
+            <Label Content="Выберите месяц:"/>
+            <DatePicker Name="MonthYearPicker" DisplayDateStart="2020-01-01" />
+            
+            <Label Content="API токен для базы данных фильмов:" Margin="0,10,0,0"/>
+            <TextBox Name="ApiTokenTextBox"/>
+
+            <Button Content="Сгенерировать отчет" Margin="0,10,0,0"/>
+        </StackPanel>
+
+        <!-- Grid Splitter -->
+        <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" />
+
+        <!-- Right Panel for Word Preview -->
+        <DockPanel Grid.Column="2">
+            <Label DockPanel.Dock="Top" Content="Предпросмотр отчета (Word):" />
+            <Border BorderBrush="Gray" BorderThickness="1">
+                <DocumentViewer Name="WordViewer"/>
+            </Border>
+        </DockPanel>
+    </Grid>
+</UserControl> 

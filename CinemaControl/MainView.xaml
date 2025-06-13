@@ -11,6 +11,9 @@
             <TabItem Header="Еженедельный отчет">
                 <local:WeeklyReportView/>
             </TabItem>
+            <TabItem Header="Ежемесячный отчет">
+                <local:MonthlyReportView/>
+            </TabItem>
             <!-- Другие вкладки могут быть добавлены здесь -->
         </TabControl>
     </Grid>
