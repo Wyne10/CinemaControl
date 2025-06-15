@@ -14,4 +14,8 @@
       <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3296.44" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Remove="Assets\folder.png" />
+    </ItemGroup>
+
 </Project>

@@ -34,7 +34,7 @@
                 <Label Content="Скачанные файлы:" VerticalAlignment="Center"/>
                 <Image x:Name="OpenFolderIcon"
                        Width="16" Height="16" Margin="5,0,0,0"
-                       Source="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iIzZBNkE2QSIgZD0iTTEwLDRINEMyLjg5LDQgMiw0Ljg5IDIsNlYxOEMyLDE5LjExIDIuODksMjAgNCwyMEgyMEMyMS4xMSwyMCAyMiwxOS4xMSAyMiwxOFY4QzIyLDYuODkgMjEuMTEsNiAyMCw2SDEyWjEwLDRaIi8+PC9zdmc+"
+                       Source="Assets\folder.png"
                        Cursor="Hand"
                        MouseLeftButtonUp="OpenReportFolder_Click" 
                        ToolTip="Открыть папку с отчетами"/>
