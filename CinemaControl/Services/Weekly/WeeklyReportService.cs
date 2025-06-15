@@ -19,13 +19,6 @@ public abstract class WeeklyReportService : IWeeklyReportService
         return sessionPath;
     }
 
-    protected async Task<IPage> GetPage()
-    {
-        using var playwright = await Playwright.CreateAsync();
-        await using var browser = await playwright.Chromium.LaunchAsync(new() { Headless = false });
-        return await browser.NewPageAsync(); 
-    }
-
     protected async Task<IFrame> GetFrame(IPage page)
     {
         var iframeElement = await page.WaitForSelectorAsync("iframe", new() { Timeout = 30000 });

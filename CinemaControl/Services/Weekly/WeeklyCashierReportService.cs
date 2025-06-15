@@ -1,4 +1,5 @@
 using System.IO;
+using Microsoft.Playwright;
 
 namespace CinemaControl.Services.Weekly;
 
@@ -9,8 +10,11 @@ public class WeeklyCashierReportService : WeeklyReportService
 
     public override async Task<string> GetReportFilesAsync(DateTime startDate, DateTime endDate)
     {
+        using var playwright = await Playwright.CreateAsync();
+        await using var browser = await playwright.Chromium.LaunchAsync(new() { Headless = false });
+        
         var sessionPath = GetSessionPath(startDate, endDate);
-        var page = await GetPage();
+        var page = await browser.NewPageAsync();
 
         for (var date = startDate; date <= endDate; date = date.AddDays(1))
         {
