@@ -10,6 +10,7 @@ namespace CinemaControl
     public partial class WeeklyReportView : UserControl
     {
         private readonly IWeeklyReportService _reportService;
+        private string? _currentReportFolderPath;
 
         public WeeklyReportView()
         {
@@ -18,6 +19,7 @@ namespace CinemaControl
             // Clear placeholder items
             DownloadedFilesListBox.Items.Clear();
             InitializeWebView();
+            OpenFolderIcon.Visibility = Visibility.Collapsed;
         }
 
         private async void InitializeWebView()
@@ -42,13 +44,18 @@ namespace CinemaControl
                 return;
             }
 
+            this.IsEnabled = false;
+            DownloadedFilesListBox.Items.Clear();
+            _currentReportFolderPath = null;
+            OpenFolderIcon.Visibility = Visibility.Collapsed;
+
             try
             {
-                // Показываем индикатор загрузки
-                this.IsEnabled = false;
-                var filePaths = await _reportService.GetReportFilesAsync(startDate.Value, endDate.Value);
-                DownloadedFilesListBox.Items.Clear();
-                foreach (var path in filePaths)
+                _currentReportFolderPath = await _reportService.GetReportFilesAsync(startDate.Value, endDate.Value);
+                
+                var filePaths = Directory.EnumerateFiles(_currentReportFolderPath, "*.pdf");
+
+                foreach (var path in filePaths.OrderBy(p => p))
                 {
                     var item = new ListBoxItem
                     {
@@ -57,6 +64,11 @@ namespace CinemaControl
                     };
                     DownloadedFilesListBox.Items.Add(item);
                 }
+
+                if (DownloadedFilesListBox.Items.Count > 0)
+                {
+                    OpenFolderIcon.Visibility = Visibility.Visible;
+                }
             }
             catch (Exception ex)
             {
@@ -64,11 +76,25 @@ namespace CinemaControl
             }
             finally
             {
-                // Убираем индикатор загрузки
                 this.IsEnabled = true;
             }
         }
         
+        private void OpenReportFolder_Click(object sender, MouseButtonEventArgs e)
+        {
+            if (!string.IsNullOrEmpty(_currentReportFolderPath) && Directory.Exists(_currentReportFolderPath))
+            {
+                try
+                {
+                    Process.Start(new ProcessStartInfo(_currentReportFolderPath) { UseShellExecute = true });
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Не удалось открыть папку: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
+
         private void DownloadedFilesListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (DownloadedFilesListBox.SelectedItem is ListBoxItem selectedItem)
