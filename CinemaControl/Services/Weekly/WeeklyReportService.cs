@@ -50,5 +50,5 @@ public abstract class WeeklyReportService : IWeeklyReportService
         await download.SaveAsAsync(path);
     }
         
-    public abstract Task<string> GetReportFilesAsync(DateTime startDate, DateTime endDate);
+    public abstract Task<string> GetReportFilesAsync(DateTime startDate, DateTime endDate, IPage page);
 }

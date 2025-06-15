@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using CinemaControl.Services.Weekly;
+using Microsoft.Playwright;
 
 namespace CinemaControl
 {
@@ -51,7 +52,10 @@ namespace CinemaControl
 
             try
             {
-                _currentReportFolderPath = await _reportService.GetReportFilesAsync(startDate.Value, endDate.Value);
+                using var playwright = await Playwright.CreateAsync();
+                await using var browser = await playwright.Chromium.LaunchAsync(new() { Headless = false });
+                var page = await browser.NewPageAsync();
+                _currentReportFolderPath = await _reportService.GetReportFilesAsync(startDate.Value, endDate.Value, page);
                 
                 var filePaths = Directory.EnumerateFiles(_currentReportFolderPath, "*.pdf");
 

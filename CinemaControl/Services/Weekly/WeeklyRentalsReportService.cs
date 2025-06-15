@@ -9,13 +9,9 @@ public class WeeklyRentalsReportService : WeeklyReportService
     private const string DateInputSelector = "input[name=\"ReportViewer1$ctl04$ctl05$txtValue\"]";
     private const string ShowRentalsSelector = "select#ReportViewer1_ctl04_ctl07_ddValue";
 
-    public override async Task<string> GetReportFilesAsync(DateTime startDate, DateTime endDate)
+    public override async Task<string> GetReportFilesAsync(DateTime startDate, DateTime endDate, IPage page)
     {
-        using var playwright = await Playwright.CreateAsync();
-        await using var browser = await playwright.Chromium.LaunchAsync(new() { Headless = false });
-        
         var sessionPath = GetSessionPath(startDate, endDate);
-        var page = await browser.NewPageAsync(); 
 
         for (var date = startDate; date <= endDate; date = date.AddDays(1))
         {
