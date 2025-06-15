@@ -1,13 +1,13 @@
-using CinemaControl.Services;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using CinemaControl.Services.Weekly;
 
 namespace CinemaControl
 {
-    public partial class WeeklyReportView : UserControl
+    public partial class WeeklyReportView
     {
         private readonly IWeeklyReportService _reportService;
         private string? _currentReportFolderPath;
@@ -15,7 +15,7 @@ namespace CinemaControl
         public WeeklyReportView()
         {
             InitializeComponent();
-            _reportService = new WeeklyReportService();
+            _reportService = new CompositeWeeklyReportService([new WeeklyRentalsReportService(), new WeeklyCashierReportService()]);
             // Clear placeholder items
             DownloadedFilesListBox.Items.Clear();
             InitializeWebView();

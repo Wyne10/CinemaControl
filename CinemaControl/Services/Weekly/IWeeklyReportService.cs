@@ -1,4 +1,4 @@
-namespace CinemaControl.Services
+namespace CinemaControl.Services.Weekly
 {
     public interface IWeeklyReportService
     {
