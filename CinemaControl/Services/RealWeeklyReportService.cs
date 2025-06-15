@@ -54,8 +54,17 @@ namespace CinemaControl.Services
                 
                 await frame.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
+                // --- ИСПРАВЛЕННАЯ ЛОГИКА ЭКСПОРТА ---
+                // 1. Нажимаем на ссылку, которая открывает меню экспорта, используя ее точный ID.
+                var exportMenuLinkSelector = "a#ReportViewer1_ctl05_ctl04_ctl00_ButtonLink";
+                await frame.ClickAsync(exportMenuLinkSelector);
+
+                // 2. Ждем, пока появится ссылка для скачивания PDF, и нажимаем на нее.
+                var pdfLinkSelector = "a[title=\"PDF\"]";
+                await frame.Locator(pdfLinkSelector).WaitForAsync(); // Явное ожидание, что ссылка появится
+
                 var downloadTask = page.WaitForDownloadAsync();
-                await page.EvaluateAsync("$find('ReportViewer1').exportReport('PDF');");
+                await frame.ClickAsync(pdfLinkSelector);
 
                 var download = await downloadTask;
                 
