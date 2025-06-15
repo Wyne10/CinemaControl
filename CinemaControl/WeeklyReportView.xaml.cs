@@ -16,7 +16,7 @@ namespace CinemaControl
         public WeeklyReportView()
         {
             InitializeComponent();
-            _reportService = new CompositeWeeklyReportService([new WeeklyRentalsReportService(), new WeeklyCashierReportService()]);
+            _reportService = new CompositeWeeklyReportService([new WeeklyRentalsReportService(), new WeeklyCashierReportService(), new WeeklyCardReportService()]);
             // Clear placeholder items
             DownloadedFilesListBox.Items.Clear();
             InitializeWebView();
