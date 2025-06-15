@@ -15,7 +15,7 @@ namespace CinemaControl
         public WeeklyReportView()
         {
             InitializeComponent();
-            _reportService = new FakeWeeklyReportService();
+            _reportService = new RealWeeklyReportService();
             // Clear placeholder items
             DownloadedFilesListBox.Items.Clear();
         }
@@ -39,6 +39,8 @@ namespace CinemaControl
 
             try
             {
+                // Показываем индикатор загрузки
+                this.IsEnabled = false; 
                 var filePaths = await _reportService.GetReportFilesAsync(startDate.Value, endDate.Value);
                 DownloadedFilesListBox.Items.Clear();
                 foreach (var path in filePaths)
@@ -54,6 +56,11 @@ namespace CinemaControl
             catch (Exception ex)
             {
                 MessageBox.Show($"Произошла ошибка при формировании отчета: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                // Убираем индикатор загрузки
+                this.IsEnabled = true;
             }
         }
 
