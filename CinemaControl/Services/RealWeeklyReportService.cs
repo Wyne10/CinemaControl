@@ -50,6 +50,11 @@ namespace CinemaControl.Services
                 var dateString = date.ToString("dd.MM.yyyy 0:00:00");
                 await frame.FillAsync(DateInputSelector, dateString);
 
+                // Выбираем "Показать" в выпадающем списке по его ID
+                var showRentalsSelector = "select#ReportViewer1_ctl04_ctl07_ddValue";
+                await frame.SelectOptionAsync(showRentalsSelector, new[] { "1" });
+
+                // Нажимаем "Просмотр отчета"
                 await frame.ClickAsync(ViewReportButtonSelector);
                 
                 await frame.WaitForLoadStateAsync(LoadState.NetworkIdle);
