@@ -18,6 +18,12 @@ namespace CinemaControl
             _reportService = new RealWeeklyReportService();
             // Clear placeholder items
             DownloadedFilesListBox.Items.Clear();
+            InitializeWebView();
+        }
+
+        private async void InitializeWebView()
+        {
+            await PdfViewer.EnsureCoreWebView2Async(null);
         }
 
         private async void GenerateReport_Click(object sender, RoutedEventArgs e)
@@ -40,7 +46,7 @@ namespace CinemaControl
             try
             {
                 // Показываем индикатор загрузки
-                this.IsEnabled = false; 
+                this.IsEnabled = false;
                 var filePaths = await _reportService.GetReportFilesAsync(startDate.Value, endDate.Value);
                 DownloadedFilesListBox.Items.Clear();
                 foreach (var path in filePaths)
@@ -63,6 +69,18 @@ namespace CinemaControl
                 this.IsEnabled = true;
             }
         }
+        
+        private void DownloadedFilesListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (DownloadedFilesListBox.SelectedItem is ListBoxItem selectedItem)
+            {
+                var filePath = selectedItem.Tag as string;
+                if (!string.IsNullOrEmpty(filePath) && File.Exists(filePath) && PdfViewer?.CoreWebView2 != null)
+                {
+                    PdfViewer.CoreWebView2.Navigate(filePath);
+                }
+            }
+        }
 
         private void DownloadedFilesListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
@@ -73,7 +91,7 @@ namespace CinemaControl
                 {
                     try
                     {
-                        Process.Start(filePath);
+                        Process.Start(new ProcessStartInfo(filePath) { UseShellExecute = true });
                     }
                     catch (Exception ex)
                     {
