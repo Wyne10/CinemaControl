@@ -1,5 +1,4 @@
 using CinemaControl.Services;
-using System;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
@@ -15,7 +14,7 @@ namespace CinemaControl
         public WeeklyReportView()
         {
             InitializeComponent();
-            _reportService = new RealWeeklyReportService();
+            _reportService = new WeeklyReportService();
             // Clear placeholder items
             DownloadedFilesListBox.Items.Clear();
             InitializeWebView();

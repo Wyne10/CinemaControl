@@ -1,16 +1,16 @@
 using Microsoft.Playwright;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Threading.Tasks;
 
 namespace CinemaControl.Services
 {
-    public class RealWeeklyReportService : IWeeklyReportService
+    public class WeeklyReportService : IWeeklyReportService
     {
         private const string ReportUrl = "http://192.168.0.254/CinemaWeb/Report/Render?path=CashReports%2FCashTotalToday";
         private const string DateInputSelector = "input[name=\"ReportViewer1$ctl04$ctl05$txtValue\"]";
         private const string ViewReportButtonSelector = "input[name=\"ReportViewer1$ctl04$ctl00\"]";
+        private const string ShowRentalsSelector = "select#ReportViewer1_ctl04_ctl07_ddValue";
+        private const string ExportMenuLinkSelector = "a#ReportViewer1_ctl05_ctl04_ctl00_ButtonLink";
+        private const string PdfLinkSelector = "a[title=\"PDF\"]";
 
         public async Task<IEnumerable<string>> GetReportFilesAsync(DateTime startDate, DateTime endDate)
         {
@@ -51,25 +51,21 @@ namespace CinemaControl.Services
                 await frame.FillAsync(DateInputSelector, dateString);
 
                 // Выбираем "Показать" в выпадающем списке по его ID
-                var showRentalsSelector = "select#ReportViewer1_ctl04_ctl07_ddValue";
-                await frame.SelectOptionAsync(showRentalsSelector, new[] { "1" });
+                await frame.SelectOptionAsync(ShowRentalsSelector, new[] { "1" });
 
                 // Нажимаем "Просмотр отчета"
                 await frame.ClickAsync(ViewReportButtonSelector);
                 
                 await frame.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-                // --- ИСПРАВЛЕННАЯ ЛОГИКА ЭКСПОРТА ---
-                // 1. Нажимаем на ссылку, которая открывает меню экспорта, используя ее точный ID.
-                var exportMenuLinkSelector = "a#ReportViewer1_ctl05_ctl04_ctl00_ButtonLink";
-                await frame.ClickAsync(exportMenuLinkSelector);
+                // Нажимаем на ссылку, которая открывает меню экспорта, используя ее точный ID.
+                await frame.ClickAsync(ExportMenuLinkSelector);
 
-                // 2. Ждем, пока появится ссылка для скачивания PDF, и нажимаем на нее.
-                var pdfLinkSelector = "a[title=\"PDF\"]";
-                await frame.Locator(pdfLinkSelector).WaitForAsync(); // Явное ожидание, что ссылка появится
+                // Ждем, пока появится ссылка для скачивания PDF, и нажимаем на нее.
+                await frame.Locator(PdfLinkSelector).WaitForAsync();
 
                 var downloadTask = page.WaitForDownloadAsync();
-                await frame.ClickAsync(pdfLinkSelector);
+                await frame.ClickAsync(PdfLinkSelector);
 
                 var download = await downloadTask;
                 
