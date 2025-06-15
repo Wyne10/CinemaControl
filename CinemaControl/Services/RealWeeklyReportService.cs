@@ -10,7 +10,7 @@ namespace CinemaControl.Services
     {
         private const string ReportUrl = "http://192.168.0.254/CinemaWeb/Report/Render?path=CashReports%2FCashTotalToday";
         private const string DateInputSelector = "input[name=\"ReportViewer1$ctl04$ctl05$txtValue\"]";
-        private const string ViewReportButtonSelector = "input[name=\"ReportViewer1$ctl04$ctl00\"]"; // Предположение, может потребовать уточнения
+        private const string ViewReportButtonSelector = "input[name=\"ReportViewer1$ctl04$ctl00\"]";
 
         public async Task<IEnumerable<string>> GetReportFilesAsync(DateTime startDate, DateTime endDate)
         {
@@ -22,29 +22,38 @@ namespace CinemaControl.Services
             Directory.CreateDirectory(tempPath);
 
             using var playwright = await Playwright.CreateAsync();
-            await using var browser = await playwright.Chromium.LaunchAsync(new() { Headless = false }); // Headless = false для наглядности
+            await using var browser = await playwright.Chromium.LaunchAsync(new() { Headless = false });
             var page = await browser.NewPageAsync();
 
             for (var date = startDate; date <= endDate; date = date.AddDays(1))
             {
                 await page.GotoAsync(ReportUrl);
 
-                // Ожидаем, пока пользователь вручную войдет в систему и появится поле для ввода даты.
-                // Увеличиваем таймаут, чтобы у пользователя было время на ввод данных.
-                var dateInput = page.Locator(DateInputSelector);
-                await dateInput.WaitForAsync(new() { Timeout = 30000 }); // 30 секунд
+                // Ожидаем, пока пользователь вручную войдет в систему и на странице появится iframe.
+                await page.WaitForSelectorAsync("iframe", new() { Timeout = 30000 });
 
-                // Ввод даты
+                // Получаем элемент iframe
+                var iframeElement = await page.QuerySelectorAsync("iframe");
+                if (iframeElement == null)
+                {
+                    throw new Exception("Не удалось найти элемент iframe на странице.");
+                }
+
+                // Получаем контент фрейма из элемента
+                var frame = await iframeElement.ContentFrameAsync();
+                if (frame == null)
+                {
+                    throw new Exception("Не удалось получить контекст iframe. Возможно, он еще не загрузился.");
+                }
+
+                // Теперь все действия выполняем в контексте этого фрейма
                 var dateString = date.ToString("dd.MM.yyyy 0:00:00");
-                await dateInput.FillAsync(dateString);
+                await frame.FillAsync(DateInputSelector, dateString);
 
-                // Нажатие кнопки "Просмотр отчета"
-                await page.ClickAsync(ViewReportButtonSelector);
+                await frame.ClickAsync(ViewReportButtonSelector);
                 
-                // Ожидаем, пока отчет обновится. Можно использовать page.WaitForLoadStateAsync() или ожидать конкретный элемент
-                await page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+                await frame.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-                // Ожидаем скачивание и выполняем скрипт экспорта
                 var downloadTask = page.WaitForDownloadAsync();
                 await page.EvaluateAsync("$find('ReportViewer1').exportReport('PDF');");
 
