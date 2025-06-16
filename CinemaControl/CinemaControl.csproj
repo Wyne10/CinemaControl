@@ -17,6 +17,8 @@
     <ItemGroup>
       <None Remove="Assets\folder.png" />
       <Resource Include="Assets\folder.png" />
+      <None Remove="Assets\settings.png" />
+      <Resource Include="Assets\settings.png" />
     </ItemGroup>
 
 </Project>

@@ -18,9 +18,6 @@
         <StackPanel Grid.Column="0" Orientation="Vertical">
             <Label Content="Выберите месяц:"/>
             <DatePicker Name="MonthYearPicker" DisplayDateStart="2020-01-01" />
-            
-            <Label Content="API токен для базы данных фильмов:" Margin="0,10,0,0"/>
-            <TextBox Name="ApiTokenTextBox"/>
 
             <Button Content="Сгенерировать отчет" Margin="0,10,0,0"/>
         </StackPanel>

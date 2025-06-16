@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="Cinema Control" Height="700" Width="900">
     <Grid>
-        <TabControl>
+        <TabControl Margin="0,0,0,-1">
             <TabItem Header="Еженедельный отчет">
                 <local:WeeklyReportView/>
             </TabItem>
@@ -19,5 +19,16 @@
             </TabItem>
             <!-- Другие вкладки могут быть добавлены здесь -->
         </TabControl>
+
+        <Button x:Name="SettingsButton" 
+                Width="30" Height="30" 
+                HorizontalAlignment="Right" VerticalAlignment="Top" 
+                Margin="0,5,5,0"
+                ToolTip="Настройки"
+                Click="SettingsButton_Click">
+            <Image x:Name="OpenFolderIcon"
+                   Width="18" Height="18"
+                   Source="Assets/settings.png"/>
+        </Button>
     </Grid>
 </Window>
