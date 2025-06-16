@@ -26,8 +26,11 @@ public abstract class WeeklyReportService(ProgressBar progressBar) : IWeeklyRepo
 
     protected async Task<IFrame> GetFrame(IPage page)
     {
-        await page.FillAsync(UserNameSelector, "Администратор");
-        await page.ClickAsync(LogInSelector);
+        if (await page.Locator(UserNameSelector).IsVisibleAsync())
+        {
+            await page.FillAsync(UserNameSelector, "Администратор");
+            await page.ClickAsync(LogInSelector);
+        }
         
         var iframeElement = await page.WaitForSelectorAsync("iframe", new() { Timeout = 30000 });
         if (iframeElement == null)
