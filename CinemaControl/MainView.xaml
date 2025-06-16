@@ -26,9 +26,7 @@
                 Margin="0,5,5,0"
                 ToolTip="Настройки"
                 Click="SettingsButton_Click">
-            <Image x:Name="OpenFolderIcon"
-                   Width="18" Height="18"
-                   Source="Assets/settings.png"/>
+            <Image Width="18" Height="18" Source="Assets/settings.png"/>
         </Button>
     </Grid>
 </Window>
