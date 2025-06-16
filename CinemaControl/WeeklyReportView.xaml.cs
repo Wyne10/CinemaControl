@@ -84,6 +84,7 @@ namespace CinemaControl
             {
                 IsEnabled = true;
                 ProgressPanel.Visibility = Visibility.Collapsed;
+                ProgressText.Text = "Загрузка...";
             }
         }
         

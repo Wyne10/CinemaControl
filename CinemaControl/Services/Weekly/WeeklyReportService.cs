@@ -7,7 +7,9 @@ namespace CinemaControl.Services.Weekly;
 public abstract class WeeklyReportService(ProgressBar progressBar) : IWeeklyReportService
 {
     private const string ReportsRootPath = "CinemaControlReports";
-        
+
+    private const string UserNameSelector = "input[name=\"UserName\"]";
+    private const string LogInSelector = "input[type=\"submit\"]";
     private const string ViewReportButtonSelector = "input[name=\"ReportViewer1$ctl04$ctl00\"]";
     private const string ExportMenuLinkSelector = "a#ReportViewer1_ctl05_ctl04_ctl00_ButtonLink";
     private const string PdfLinkSelector = "a[title=\"PDF\"]";
@@ -24,6 +26,9 @@ public abstract class WeeklyReportService(ProgressBar progressBar) : IWeeklyRepo
 
     protected async Task<IFrame> GetFrame(IPage page)
     {
+        await page.FillAsync(UserNameSelector, "Администратор");
+        await page.ClickAsync(LogInSelector);
+        
         var iframeElement = await page.WaitForSelectorAsync("iframe", new() { Timeout = 30000 });
         if (iframeElement == null)
         {
@@ -44,7 +49,7 @@ public abstract class WeeklyReportService(ProgressBar progressBar) : IWeeklyRepo
         await frame.ClickAsync(ViewReportButtonSelector);
         await frame.WaitForLoadStateAsync(LoadState.NetworkIdle);
         await frame.ClickAsync(ExportMenuLinkSelector);
-        await frame.Locator(PdfLinkSelector).WaitForAsync();
+        await frame.WaitForSelectorAsync(PdfLinkSelector);
             
         var downloadTask = page.WaitForDownloadAsync();
         await frame.ClickAsync(PdfLinkSelector);
