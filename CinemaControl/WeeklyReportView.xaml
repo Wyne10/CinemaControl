@@ -20,6 +20,7 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
             <StackPanel Grid.Row="0" Orientation="Vertical">
@@ -48,6 +49,12 @@
                 <ListBoxItem Content="report_2023-10-24.pdf"/>
                 <ListBoxItem Content="report_2023-10-25.pdf"/>
             </ListBox>
+
+            <!-- Progress Indicator -->
+            <StackPanel Grid.Row="3" x:Name="ProgressPanel" Visibility="Collapsed" Margin="0,5,0,0">
+                <TextBlock x:Name="ProgressText" Text="Загрузка..." Margin="0,0,0,2"/>
+                <ProgressBar x:Name="ReportProgressBar" Height="18" IsIndeterminate="False" ValueChanged="ReportProgressBar_OnValueChanged"/>
+            </StackPanel>
         </Grid>
 
         <!-- Grid Splitter -->

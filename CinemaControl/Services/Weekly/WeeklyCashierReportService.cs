@@ -1,13 +1,22 @@
 using System.IO;
+using System.Windows.Controls;
 using Microsoft.Playwright;
 
 namespace CinemaControl.Services.Weekly;
 
-public class WeeklyCashierReportService : WeeklyReportService
+public class WeeklyCashierReportService(ProgressBar progressBar) : WeeklyReportService(progressBar)
 {
     private const string ReportUrl = "http://192.168.0.254/CinemaWeb/Report/Render?path=CashReports%2FCashTodayByUsers";
     private const string DateInputSelector = "input[name=\"ReportViewer1$ctl04$ctl03$txtValue\"]";
 
+    public override int GetFilesCount(DateTime startDate, DateTime endDate)
+    {
+        var count = 0;
+        for (var date = startDate; date <= endDate; date = date.AddDays(1))
+            count++;
+        return count;
+    }
+    
     public override async Task<string> GetReportFilesAsync(DateTime startDate, DateTime endDate, IPage page)
     {
         var sessionPath = GetSessionPath(startDate, endDate);
@@ -23,6 +32,7 @@ public class WeeklyCashierReportService : WeeklyReportService
             var newFileName = $"разбивкой по кассирам {date:yyyy-MM-dd}.pdf";
             var newFilePath = Path.Combine(sessionPath, newFileName);
             await SaveReport(page, frame, newFilePath);
+            ProgressBar.Value++;
         }
 
         return sessionPath;

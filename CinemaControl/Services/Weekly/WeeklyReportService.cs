@@ -1,16 +1,19 @@
 using System.IO;
+using System.Windows.Controls;
 using Microsoft.Playwright;
 
 namespace CinemaControl.Services.Weekly;
 
-public abstract class WeeklyReportService : IWeeklyReportService
+public abstract class WeeklyReportService(ProgressBar progressBar) : IWeeklyReportService
 {
     private const string ReportsRootPath = "CinemaControlReports";
         
     private const string ViewReportButtonSelector = "input[name=\"ReportViewer1$ctl04$ctl00\"]";
     private const string ExportMenuLinkSelector = "a#ReportViewer1_ctl05_ctl04_ctl00_ButtonLink";
     private const string PdfLinkSelector = "a[title=\"PDF\"]";
-    
+
+    protected ProgressBar ProgressBar { get; private set; } = progressBar;
+
     protected string GetSessionPath(DateTime startDate, DateTime endDate)
     {
         var reportsRootPath = Path.Combine(Path.GetTempPath(), ReportsRootPath);
@@ -49,6 +52,8 @@ public abstract class WeeklyReportService : IWeeklyReportService
         var download = await downloadTask;
         await download.SaveAsAsync(path);
     }
-        
+
+    public abstract int GetFilesCount(DateTime startDate, DateTime endDate);
+
     public abstract Task<string> GetReportFilesAsync(DateTime startDate, DateTime endDate, IPage page);
 }

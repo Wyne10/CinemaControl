@@ -16,7 +16,7 @@ namespace CinemaControl
         public WeeklyReportView()
         {
             InitializeComponent();
-            _reportService = new CompositeWeeklyReportService([new WeeklyRentalsReportService(), new WeeklyCashierReportService(), new WeeklyCardReportService()]);
+            _reportService = new CompositeWeeklyReportService([new WeeklyRentalsReportService(ReportProgressBar), new WeeklyCashierReportService(ReportProgressBar), new WeeklyCardReportService(ReportProgressBar)], ReportProgressBar);
             // Clear placeholder items
             DownloadedFilesListBox.Items.Clear();
             InitializeWebView();
@@ -45,7 +45,9 @@ namespace CinemaControl
                 return;
             }
 
-            this.IsEnabled = false;
+            IsEnabled = false;
+            ReportProgressBar.Maximum = _reportService.GetFilesCount(startDate.Value, endDate.Value);
+            ProgressPanel.Visibility = Visibility.Visible;
             DownloadedFilesListBox.Items.Clear();
             _currentReportFolderPath = null;
             OpenFolderIcon.Visibility = Visibility.Collapsed;
@@ -80,7 +82,8 @@ namespace CinemaControl
             }
             finally
             {
-                this.IsEnabled = true;
+                IsEnabled = true;
+                ProgressPanel.Visibility = Visibility.Collapsed;
             }
         }
         
@@ -128,6 +131,11 @@ namespace CinemaControl
                     }
                 }
             }
+        }
+
+        private void ReportProgressBar_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            ProgressText.Text = $"Загрузка {ReportProgressBar.Value}/{ReportProgressBar.Maximum}";
         }
     }
 } 
