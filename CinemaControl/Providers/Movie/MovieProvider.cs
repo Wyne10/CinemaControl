@@ -4,8 +4,9 @@ using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Web;
 using CinemaControl.Dtos;
+using CinemaControl.Services;
 
-namespace CinemaControl.Services;
+namespace CinemaControl.Providers.Movie;
 
 public class MovieProvider : IMovieProvider
 {
@@ -15,7 +16,7 @@ public class MovieProvider : IMovieProvider
     private readonly SettingsService _settingsService;
     
     private readonly string _movieCacheFilePath;
-    private readonly Dictionary<string, Movie> _movieCache;
+    private readonly Dictionary<string, Dtos.Movie> _movieCache;
 
     public MovieProvider(SettingsService settingsService)
     {
@@ -34,7 +35,7 @@ public class MovieProvider : IMovieProvider
     public async Task<bool> IsChildrenAvailable(string movieName) =>
         _movieCache!.GetValueOrDefault(movieName, WriteMovieCache(movieName, await FetchMovieData(movieName)))?.AgeRating <= 6;
     
-    private async Task<Movie?> FetchMovieData(string movieName)
+    private async Task<Dtos.Movie?> FetchMovieData(string movieName)
     {
         var apiToken = _settingsService.Settings.ApiToken;
         if (string.IsNullOrWhiteSpace(apiToken))
@@ -68,7 +69,7 @@ public class MovieProvider : IMovieProvider
         return movieDto;
     }
 
-    private Movie? WriteMovieCache(string movieName, Movie? movie)
+    private Dtos.Movie? WriteMovieCache(string movieName, Dtos.Movie? movie)
     {
         if (movie == null)
             return movie; 
@@ -77,7 +78,7 @@ public class MovieProvider : IMovieProvider
         return movie;
     }
     
-    private Dictionary<string, Movie> LoadMovieCache()
+    private Dictionary<string, Dtos.Movie> LoadMovieCache()
     {
         if (!File.Exists(_movieCacheFilePath))
         {
@@ -87,7 +88,7 @@ public class MovieProvider : IMovieProvider
         try
         {
             var json = File.ReadAllText(_movieCacheFilePath);
-            return JsonSerializer.Deserialize<Dictionary<string, Movie>>(json) ?? new();
+            return JsonSerializer.Deserialize<Dictionary<string, Dtos.Movie>>(json) ?? new();
         }
         catch
         {

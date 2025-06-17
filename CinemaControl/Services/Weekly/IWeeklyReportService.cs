@@ -1,10 +1,9 @@
 using Microsoft.Playwright;
 
-namespace CinemaControl.Services.Weekly
+namespace CinemaControl.Services.Weekly;
+
+public interface IWeeklyReportService
 {
-    public interface IWeeklyReportService
-    {
-        int GetFilesCount(DateTime startDate, DateTime endDate);
-        Task<string> GetReportFilesAsync(DateTime startDate, DateTime endDate, IPage page);
-    }
-} 
+    int GetFilesCount(DateTime startDate, DateTime endDate);
+    Task<string> GetReportFiles(DateTime startDate, DateTime endDate, IPage page);
+}

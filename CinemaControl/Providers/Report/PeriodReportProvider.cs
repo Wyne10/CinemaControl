@@ -1,0 +1,20 @@
+﻿using Microsoft.Playwright;
+
+namespace CinemaControl.Providers.Report;
+
+public class PeriodReportProvider(DateTime from, DateTime to) : ReportProvider
+{
+    private const string DateFromInputSelector = "input[name=\"ReportViewer1$ctl04$ctl03$txtValue\"]";
+    private const string DateToInputSelector = "input[name=\"ReportViewer1$ctl04$ctl05$txtValue\"]";
+    
+    public override async Task<IDownload> DownloadReport(IPage page, IFrame frame, ReportSaveType saveType)
+    {
+        var dateFromString = from.ToString("dd.MM.yyyy 0:00:00");
+        await frame.FillAsync(DateFromInputSelector, dateFromString);
+        
+        var dateToString = to.ToString("dd.MM.yyyy 0:00:00");
+        await frame.FillAsync(DateToInputSelector, dateToString);
+        
+        return await base.DownloadReport(page, frame, saveType);
+    }
+}

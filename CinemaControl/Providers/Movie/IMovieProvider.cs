@@ -1,4 +1,4 @@
-﻿namespace CinemaControl.Services;
+﻿namespace CinemaControl.Providers.Movie;
 
 public interface IMovieProvider
 {
