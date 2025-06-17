@@ -2,6 +2,5 @@
 
 public interface IMovieProvider
 {
-    Task<bool> IsRussian(string movieName);
-    Task<bool> IsChildrenAvailable(string movieName);
+    Task<Dictionary<string, Dtos.Movie>> GetMovies(IEnumerable<string> movieNames);
 }

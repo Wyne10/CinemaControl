@@ -1,8 +1,7 @@
-namespace CinemaControl.Models
+namespace CinemaControl.Models;
+
+public class AppSettings
 {
-    public class AppSettings
-    {
-        public string? ApiToken { get; set; }
-        public string? MonthlyReportTemplatePath { get; set; }
-    }
-} 
+    public string? ApiToken { get; set; }
+    public string? MonthlyReportTemplatePath { get; set; }
+}

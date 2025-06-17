@@ -60,6 +60,10 @@ public class Movie
 
     [JsonPropertyName("countries")]
     public List<Country>? Countries { get; set; }
+    
+    public bool IsRussian() => Countries?.Any(c => c.Name == "Россия") ?? false;
+
+    public bool IsChildrenAvailable() => AgeRating <= 6;
 }
 
 public class Logo

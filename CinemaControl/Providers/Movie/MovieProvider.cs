@@ -34,7 +34,19 @@ public class MovieProvider : IMovieProvider
 
     public async Task<bool> IsChildrenAvailable(string movieName) =>
         _movieCache!.GetValueOrDefault(movieName, WriteMovieCache(movieName, await FetchMovieData(movieName)))?.AgeRating <= 6;
-    
+
+    public async Task<Dictionary<string, Dtos.Movie>> GetMovies(IEnumerable<string> movieNames)
+    {
+        var movies = new Dictionary<string, Dtos.Movie>();
+        foreach (var movieName in movieNames)
+        {
+            var movie = _movieCache!.GetValueOrDefault(movieName, WriteMovieCache(movieName, await FetchMovieData(movieName)));
+            if (movie != null)
+                movies[movieName] = movie;
+        }
+        return movies;
+    }
+
     private async Task<Dtos.Movie?> FetchMovieData(string movieName)
     {
         var apiToken = _settingsService.Settings.ApiToken;
