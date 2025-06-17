@@ -7,11 +7,11 @@ using ClosedXML.Excel;
 
 namespace CinemaControl.Services.Monthly;
 
-public class MonthlyReportService(IMovieProvider movieProvider) : ReportService, IMonthlyReportService
+public class MonthlyReportService(IMovieProvider movieProvider) : ReportService
 {
     private const string ReportUrl = "http://192.168.0.254/CinemaWeb/Report/Render?path=RentalReports%2FGrossMovieByPeriodn";
 
-    public async Task<string> GenerateReportFiles(DateTime from, DateTime to, IPage page)
+    public override async Task<string> GenerateReportFiles(DateTime from, DateTime to, IPage page)
     {
         var sessionPath = GetSessionPath(from, to);
 

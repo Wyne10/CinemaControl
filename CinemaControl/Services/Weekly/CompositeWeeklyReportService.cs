@@ -10,9 +10,9 @@ public class CompositeWeeklyReportService(IEnumerable<IWeeklyReportService> week
             .Select(w => w.GetFilesCount(from, to))
             .Aggregate((acc, next) => acc + next);
 
-    public override async Task<string> GetReportFiles(DateTime from, DateTime to, IPage page)
+    public override async Task<string> GenerateReportFiles(DateTime from, DateTime to, IPage page)
     {
-        foreach(IWeeklyReportService weeklyReportService in weeklyReportServices) await weeklyReportService.GetReportFiles(from, to, page);
+        foreach(IWeeklyReportService weeklyReportService in weeklyReportServices) await weeklyReportService.GenerateReportFiles(from, to, page);
         return GetSessionPath(from, to);
     }
 }

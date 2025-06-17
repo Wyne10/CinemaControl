@@ -57,7 +57,7 @@ namespace CinemaControl
                 using var playwright = await Playwright.CreateAsync();
                 await using var browser = await playwright.Chromium.LaunchAsync(new() { Headless = false });
                 var page = await browser.NewPageAsync();
-                _currentReportFolderPath = await _reportService.GetReportFiles(startDate.Value, endDate.Value, page);
+                _currentReportFolderPath = await _reportService.GenerateReportFiles(startDate.Value, endDate.Value, page);
                 
                 var filePaths = Directory.EnumerateFiles(_currentReportFolderPath, "*.pdf");
 

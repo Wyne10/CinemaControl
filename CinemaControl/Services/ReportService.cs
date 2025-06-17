@@ -3,7 +3,7 @@ using Microsoft.Playwright;
 
 namespace CinemaControl.Services;
 
-public abstract class ReportService
+public abstract class ReportService : IReportService
 {
     private const string ReportsRootPath = "CinemaControlReports";
     
@@ -40,4 +40,6 @@ public abstract class ReportService
 
         return frame;
     }
+
+    public abstract Task<string> GenerateReportFiles(DateTime from, DateTime to, IPage page);
 }

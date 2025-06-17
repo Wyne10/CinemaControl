@@ -11,7 +11,7 @@ public class WeeklyCardReportService(ProgressBar progressBar) : WeeklyReportServ
 
     public override int GetFilesCount(DateTime from, DateTime to) => 1;
 
-    public override async Task<string> GetReportFiles(DateTime from, DateTime to, IPage page)
+    public override async Task<string> GenerateReportFiles(DateTime from, DateTime to, IPage page)
     {
         var sessionPath = GetSessionPath(from, to);
 

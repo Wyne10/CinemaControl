@@ -17,7 +17,7 @@ public class WeeklyCashierReportService(ProgressBar progressBar) : WeeklyReportS
         return count;
     }
     
-    public override async Task<string> GetReportFiles(DateTime from, DateTime to, IPage page)
+    public override async Task<string> GenerateReportFiles(DateTime from, DateTime to, IPage page)
     {
         var sessionPath = GetSessionPath(from, to);
 

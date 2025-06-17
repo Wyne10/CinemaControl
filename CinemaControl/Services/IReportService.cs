@@ -1,8 +1,8 @@
 ﻿using Microsoft.Playwright;
 
-namespace CinemaControl.Services.Monthly;
+namespace CinemaControl.Services;
 
-public interface IMonthlyReportService
+public interface IReportService
 {
     Task<string> GenerateReportFiles(DateTime from, DateTime to, IPage page);
 }
