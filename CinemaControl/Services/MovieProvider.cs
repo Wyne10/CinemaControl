@@ -1,0 +1,104 @@
+﻿using System.IO;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text.Json;
+using System.Web;
+using CinemaControl.Dtos;
+
+namespace CinemaControl.Services;
+
+public class MovieProvider : IMovieProvider
+{
+    private const string ApiBaseUrl = "https://api.kinopoisk.dev/v1.4/movie/search";
+    private static readonly HttpClient HttpClient = new();
+    
+    private readonly SettingsService _settingsService;
+    
+    private readonly string _movieCacheFilePath;
+    private readonly Dictionary<string, Movie> _movieCache;
+
+    public MovieProvider(SettingsService settingsService)
+    {
+        _settingsService = settingsService;
+        var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+        var appFolderPath = Path.Combine(appDataPath, "CinemaControl");
+        Directory.CreateDirectory(appFolderPath);
+        _movieCacheFilePath = Path.Combine(appFolderPath, "movies.json");
+            
+        _movieCache = LoadMovieCache(); 
+    }
+
+    public async Task<bool> IsRussian(string movieName) =>
+        (_movieCache!.GetValueOrDefault(movieName, WriteMovieCache(movieName, await FetchMovieData(movieName)))?.Countries ?? Enumerable.Empty<Country>()).Any(c => c.Name == "Россия");
+
+    public async Task<bool> IsChildrenAvailable(string movieName) =>
+        _movieCache!.GetValueOrDefault(movieName, WriteMovieCache(movieName, await FetchMovieData(movieName)))?.AgeRating <= 6;
+    
+    private async Task<Movie?> FetchMovieData(string movieName)
+    {
+        var apiToken = _settingsService.Settings.ApiToken;
+        if (string.IsNullOrWhiteSpace(apiToken))
+        {
+            throw new Exception("Не установлен API токен.");
+        }
+
+        var builder = new UriBuilder(ApiBaseUrl);
+        var query = HttpUtility.ParseQueryString(builder.Query);
+        query["page"] = "1";
+        query["limit"] = "1";
+        query["query"] = movieName;
+        builder.Query = query.ToString();
+            
+        using var request = new HttpRequestMessage(HttpMethod.Get, builder.ToString());
+        request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        request.Headers.Add("X-API-KEY", apiToken);
+
+        var response = await HttpClient.SendAsync(request);
+        response.EnsureSuccessStatusCode();
+
+        var jsonResponse = await response.Content.ReadAsStringAsync();
+        var searchResult = JsonSerializer.Deserialize<SearchResponse>(jsonResponse);
+
+        var movieDto = searchResult?.Docs?.FirstOrDefault();
+        if (movieDto == null)
+        {
+            throw new Exception($"Фильм {movieName} не найден.");
+        }
+
+        return movieDto;
+    }
+
+    private Movie? WriteMovieCache(string movieName, Movie? movie)
+    {
+        if (movie == null)
+            return movie; 
+        _movieCache[movieName] = movie;
+        SaveMovieCache();
+        return movie;
+    }
+    
+    private Dictionary<string, Movie> LoadMovieCache()
+    {
+        if (!File.Exists(_movieCacheFilePath))
+        {
+            return new();
+        }
+
+        try
+        {
+            var json = File.ReadAllText(_movieCacheFilePath);
+            return JsonSerializer.Deserialize<Dictionary<string, Movie>>(json) ?? new();
+        }
+        catch
+        {
+            // If file is corrupt or invalid, return default settings
+            return new();
+        }
+    }
+
+    public async void SaveMovieCache()
+    {
+        var json = JsonSerializer.Serialize(_movieCache, new JsonSerializerOptions { WriteIndented = true });
+        await File.WriteAllTextAsync(_movieCacheFilePath, json);
+    }
+}
