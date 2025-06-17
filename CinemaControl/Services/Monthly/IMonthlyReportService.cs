@@ -4,5 +4,5 @@ namespace CinemaControl.Services.Monthly;
 
 public interface IMonthlyReportService
 {
-    Task<string> GenerateReportFile(DateTime date, IPage page);
+    Task<string> GenerateReportFiles(DateTime from, DateTime to, IPage page);
 }

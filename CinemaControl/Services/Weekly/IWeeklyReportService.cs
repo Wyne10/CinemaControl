@@ -4,6 +4,6 @@ namespace CinemaControl.Services.Weekly;
 
 public interface IWeeklyReportService
 {
-    int GetFilesCount(DateTime startDate, DateTime endDate);
-    Task<string> GetReportFiles(DateTime startDate, DateTime endDate, IPage page);
+    int GetFilesCount(DateTime from, DateTime to);
+    Task<string> GetReportFiles(DateTime from, DateTime to, IPage page);
 }

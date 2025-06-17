@@ -7,7 +7,7 @@ public abstract class WeeklyReportService(ProgressBar progressBar) : ReportServi
 {
     protected ProgressBar ProgressBar { get; private set; } = progressBar;
 
-    public abstract int GetFilesCount(DateTime startDate, DateTime endDate);
+    public abstract int GetFilesCount(DateTime from, DateTime to);
 
-    public abstract Task<string> GetReportFiles(DateTime startDate, DateTime endDate, IPage page);
+    public abstract Task<string> GetReportFiles(DateTime from, DateTime to, IPage page);
 }

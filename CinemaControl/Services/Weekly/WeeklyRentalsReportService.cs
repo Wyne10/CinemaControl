@@ -10,19 +10,19 @@ public class WeeklyRentalsReportService(ProgressBar progressBar) : WeeklyReportS
     private const string ReportUrl = "http://192.168.0.254/CinemaWeb/Report/Render?path=CashReports%2FCashTotalToday";
     private const string ShowRentalsSelector = "select#ReportViewer1_ctl04_ctl07_ddValue";
 
-    public override int GetFilesCount(DateTime startDate, DateTime endDate)
+    public override int GetFilesCount(DateTime from, DateTime to)
     {
         var count = 0;
-        for (var date = startDate; date <= endDate; date = date.AddDays(1))
+        for (var date = from; date <= to; date = date.AddDays(1))
             count++;
         return count;
     }
 
-    public override async Task<string> GetReportFiles(DateTime startDate, DateTime endDate, IPage page)
+    public override async Task<string> GetReportFiles(DateTime from, DateTime to, IPage page)
     {
-        var sessionPath = GetSessionPath(startDate, endDate);
+        var sessionPath = GetSessionPath(from, to);
 
-        for (var date = startDate; date <= endDate; date = date.AddDays(1))
+        for (var date = from; date <= to; date = date.AddDays(1))
         {
             await page.GotoAsync(ReportUrl);
             var frame = await GetFrame(page);

@@ -5,14 +5,14 @@ namespace CinemaControl.Services.Weekly;
 
 public class CompositeWeeklyReportService(IEnumerable<IWeeklyReportService> weeklyReportServices, ProgressBar progressBar) : WeeklyReportService(progressBar)
 {
-    public override int GetFilesCount(DateTime startDate, DateTime endDate) =>
+    public override int GetFilesCount(DateTime from, DateTime to) =>
         weeklyReportServices
-            .Select(w => w.GetFilesCount(startDate, endDate))
+            .Select(w => w.GetFilesCount(from, to))
             .Aggregate((acc, next) => acc + next);
 
-    public override async Task<string> GetReportFiles(DateTime startDate, DateTime endDate, IPage page)
+    public override async Task<string> GetReportFiles(DateTime from, DateTime to, IPage page)
     {
-        foreach(IWeeklyReportService weeklyReportService in weeklyReportServices) await weeklyReportService.GetReportFiles(startDate, endDate, page);
-        return GetSessionPath(startDate, endDate);
+        foreach(IWeeklyReportService weeklyReportService in weeklyReportServices) await weeklyReportService.GetReportFiles(from, to, page);
+        return GetSessionPath(from, to);
     }
 }

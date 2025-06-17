@@ -10,6 +10,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="ClosedXML" Version="0.105.0" />
       <PackageReference Include="Microsoft.Playwright" Version="1.52.0" />
       <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3296.44" />
     </ItemGroup>
