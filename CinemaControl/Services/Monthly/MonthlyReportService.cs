@@ -155,7 +155,7 @@ public class MonthlyReportService(SettingsService settingsService, IMovieProvide
         await page.GotoAsync(CardReportUrl);
         var frame = await GetFrame(page);
 
-        var newFileName = $"По пушкинской {from:dd.MM.yy} - {to:dd.MM.yy}.pdf";
+        var newFileName = $"По пушкинской {from:dd.MM.yy} - {to:dd.MM.yy}.xlsx";
         var newFilePath = Path.Combine(sessionPath, newFileName);
         var reportProvider = new PeriodReportProvider(from, to);
         var download = await reportProvider.DownloadReport(page, frame, ReportSaveType.Excel);
