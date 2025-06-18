@@ -84,6 +84,7 @@ public partial class WeeklyReportView
         {
             IsEnabled = true;
             ProgressPanel.Visibility = Visibility.Collapsed;
+            ReportProgressBar.Value = 0;
             ProgressText.Text = "Загрузка...";
         }
     }

@@ -94,22 +94,22 @@ public class MovieProvider : IMovieProvider
     {
         if (!File.Exists(_movieCacheFilePath))
         {
-            return new();
+            return new Dictionary<string, Dtos.Movie>();
         }
 
         try
         {
             var json = File.ReadAllText(_movieCacheFilePath);
-            return JsonSerializer.Deserialize<Dictionary<string, Dtos.Movie>>(json) ?? new();
+            return JsonSerializer.Deserialize<Dictionary<string, Dtos.Movie>>(json) ?? new Dictionary<string, Dtos.Movie>();
         }
         catch
         {
             // If file is corrupt or invalid, return default settings
-            return new();
+            return new Dictionary<string, Dtos.Movie>();
         }
     }
 
-    public async void SaveMovieCache()
+    private async void SaveMovieCache()
     {
         var json = JsonSerializer.Serialize(_movieCache, new JsonSerializerOptions { WriteIndented = true });
         await File.WriteAllTextAsync(_movieCacheFilePath, json);
