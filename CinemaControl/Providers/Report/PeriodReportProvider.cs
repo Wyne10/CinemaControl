@@ -11,7 +11,7 @@ public class PeriodReportProvider(DateTime from, DateTime to) : ReportProvider
     {
         var dateFromString = from.ToString("dd.MM.yyyy 0:00:00");
         await frame.Locator(DateFromInputSelector).FillAsync(dateFromString);
-        
+        await page.WaitForLoadStateAsync(LoadState.NetworkIdle);
         var dateToString = to.ToString("dd.MM.yyyy 0:00:00");
         await frame.Locator(DateToInputSelector).FillAsync(dateToString);
         

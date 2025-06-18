@@ -61,6 +61,10 @@ public class MonthlyReportService(SettingsService settingsService, IMovieProvide
         var sessionAdults = sessionTotal - sessionChildren - sessionTeenagers;
         var viewerAdults = viewerTotal - viewerChildren - viewerTeenagers;
 
+        document.ReplaceText(new StringReplaceTextOptions
+            { SearchValue = "{{month}}", NewValue = System.Globalization.DateTimeFormatInfo.CurrentInfo.GetMonthName(from.Month) });
+        document.ReplaceText(new StringReplaceTextOptions
+            { SearchValue = "{{year}}", NewValue = from.Year.ToString() }); 
         document.ReplaceText(new StringReplaceTextOptions 
             { SearchValue = "{{session_total}}", NewValue = sessionTotal.ToString() });
         document.ReplaceText(new StringReplaceTextOptions 
@@ -106,6 +110,7 @@ public class MonthlyReportService(SettingsService settingsService, IMovieProvide
 
         string currentMovieTitle = string.Empty;
 
+        // TODO Use RowsUsed instead?
         // Пропускаем первые 4 строки (заголовки)
         foreach (var row in worksheet.Rows().Skip(4))
         {
