@@ -58,7 +58,13 @@
         <DockPanel Grid.Column="2">
             <Label DockPanel.Dock="Top" Content="Предпросмотр:" />
             <Border BorderBrush="Gray" BorderThickness="1">
-                <wv2:WebView2 Name="WebView"/>
+                <Grid>
+                    <wv2:WebView2 Name="WebView" Visibility="Collapsed"/>
+                    <DataGrid Name="ExcelDataGrid" Visibility="Collapsed" IsReadOnly="True" AutoGenerateColumns="True"/>
+                    <ScrollViewer Name="WordScrollViewer" Visibility="Collapsed">
+                        <TextBlock Name="WordTextBlock" TextWrapping="Wrap" Padding="5"/>
+                    </ScrollViewer>
+                </Grid>
             </Border>
         </DockPanel>
     </Grid>

@@ -5,6 +5,9 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using CinemaControl.Services;
 using Microsoft.Playwright;
+using ClosedXML.Excel;
+using Xceed.Words.NET;
+using System.Data;
 
 namespace CinemaControl;
 
@@ -99,15 +102,71 @@ public partial class ReportView
         }
     }
 
+    private void HideAllPreviewers()
+    {
+        WebView.Visibility = Visibility.Collapsed;
+        ExcelDataGrid.Visibility = Visibility.Collapsed;
+        WordScrollViewer.Visibility = Visibility.Collapsed;
+    }
+
     private void DownloadedFilesListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (DownloadedFilesListBox.SelectedItem is ListBoxItem selectedItem)
+        HideAllPreviewers();
+        if (DownloadedFilesListBox.SelectedItem is not ListBoxItem selectedItem) return;
+
+        var filePath = selectedItem.Tag as string;
+        if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath)) return;
+
+        var extension = Path.GetExtension(filePath).ToLowerInvariant();
+
+        try
         {
-            var filePath = selectedItem.Tag as string;
-            if (!string.IsNullOrEmpty(filePath) && File.Exists(filePath) && WebView?.CoreWebView2 != null)
+            switch (extension)
             {
-                WebView.CoreWebView2.Navigate(filePath);
+                case ".pdf":
+                    if (WebView?.CoreWebView2 != null)
+                    {
+                        WebView.Visibility = Visibility.Visible;
+                        WebView.CoreWebView2.Navigate(filePath);
+                    }
+                    break;
+                case ".docx":
+                    var doc = DocX.Load(filePath);
+                    WordTextBlock.Text = doc.Text;
+                    WordScrollViewer.Visibility = Visibility.Visible;
+                    break;
+                case ".xlsx":
+                    using (var workbook = new XLWorkbook(filePath))
+                    {
+                        var worksheet = workbook.Worksheets.FirstOrDefault();
+                        if (worksheet == null) return;
+
+                        var dt = new DataTable();
+                        // Создание колонок
+                        foreach (var cell in worksheet.FirstRow().Cells())
+                        {
+                            dt.Columns.Add(cell.Value.ToString());
+                        }
+
+                        // Добавление строк
+                        foreach (var row in worksheet.Rows().Skip(1))
+                        {
+                            var newRow = dt.NewRow();
+                            for (int i = 0; i < dt.Columns.Count; i++)
+                            {
+                                newRow[i] = row.Cell(i + 1).Value.ToString();
+                            }
+                            dt.Rows.Add(newRow);
+                        }
+                        ExcelDataGrid.ItemsSource = dt.DefaultView;
+                    }
+                    ExcelDataGrid.Visibility = Visibility.Visible;
+                    break;
             }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Не удалось загрузить предпросмотр файла: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 
