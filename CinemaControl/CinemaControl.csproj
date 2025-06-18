@@ -12,9 +12,9 @@
 
     <ItemGroup>
       <PackageReference Include="ClosedXML" Version="0.105.0" />
+      <PackageReference Include="DocX" Version="4.0.25105.5786" />
       <PackageReference Include="Microsoft.Playwright" Version="1.52.0" />
       <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3296.44" />
-      <PackageReference Include="SautinSoft.Document" Version="2025.6.10" />
     </ItemGroup>
 
     <ItemGroup>

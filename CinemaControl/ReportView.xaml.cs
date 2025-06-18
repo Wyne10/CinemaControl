@@ -5,7 +5,6 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using CinemaControl.Services;
 using Microsoft.Playwright;
-using SautinSoft.Document;
 
 namespace CinemaControl;
 
@@ -58,9 +57,7 @@ public partial class ReportView
             var page = await browser.NewPageAsync();
             _currentReportFolderPath = await _reportService.GenerateReportFiles(startDate.Value, endDate.Value, page);
                 
-            var supportedExtensions = new[] { ".pdf", ".docx", ".xlsx" };
-            var filePaths = Directory.EnumerateFiles(_currentReportFolderPath)
-                .Where(p => supportedExtensions.Contains(Path.GetExtension(p).ToLowerInvariant()));
+            var filePaths = Directory.EnumerateFiles(_currentReportFolderPath);
 
             foreach (var path in filePaths.OrderBy(p => p))
             {
@@ -107,55 +104,29 @@ public partial class ReportView
         if (DownloadedFilesListBox.SelectedItem is ListBoxItem selectedItem)
         {
             var filePath = selectedItem.Tag as string;
-            PreviewFile(filePath);
-        }
-    }
-
-    private void PreviewFile(string? filePath)
-    {
-        if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath) || WebView?.CoreWebView2 == null) return;
-
-        var extension = Path.GetExtension(filePath).ToLowerInvariant();
-
-        switch (extension)
-        {
-            case ".pdf":
-                WebView.CoreWebView2.Navigate(filePath);
-                break;
-            case ".docx":
-            case ".xlsx":
+            if (!string.IsNullOrEmpty(filePath) && File.Exists(filePath) && WebView?.CoreWebView2 != null)
             {
-                var tempHtmlFile = Path.Combine(Path.GetTempPath(), $"{Path.GetFileNameWithoutExtension(filePath)}.html");
-            
-                var dc = DocumentCore.Load(filePath);
-            
-                HtmlFixedSaveOptions options = new()
-                {
-                    Version = HtmlVersion.Html5,
-                    CssExportMode = CssExportMode.Inline
-                };
-
-                dc.Save(tempHtmlFile, options);
-            
-                WebView.CoreWebView2.Navigate(tempHtmlFile);
-                break;
+                WebView.CoreWebView2.Navigate(filePath);
             }
         }
     }
 
     private void DownloadedFilesListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
     {
-        if (DownloadedFilesListBox.SelectedItem is not ListBoxItem selectedItem) return;
-        var filePath = selectedItem.Tag as string;
-        if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath)) return;
-        
-        try
+        if (DownloadedFilesListBox.SelectedItem is ListBoxItem selectedItem)
         {
-            Process.Start(new ProcessStartInfo(filePath) { UseShellExecute = true });
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show($"Не удалось открыть файл: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            var filePath = selectedItem.Tag as string;
+            if (!string.IsNullOrEmpty(filePath) && File.Exists(filePath))
+            {
+                try
+                {
+                    Process.Start(new ProcessStartInfo(filePath) { UseShellExecute = true });
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Не удалось открыть файл: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
         }
     }
 }
