@@ -56,8 +56,8 @@ public class MonthlyReportService(SettingsService settingsService, IMovieProvide
         var viewerChildren = grossMovieData
             .Where(data => movies[data.MovieName].IsChildrenAvailable())
             .Sum(data => data.ViewerCount);
-        var sessionTeenagers = (int)(sessionTotal * 0.7);
-        var viewerTeenagers = (int)(viewerTotal * 0.7);
+        var sessionTeenagers = (int)((sessionTotal - sessionChildren) * 0.7);
+        var viewerTeenagers = (int)((viewerTotal - viewerChildren) * 0.7);
         var sessionAdults = sessionTotal - sessionChildren - sessionTeenagers;
         var viewerAdults = viewerTotal - viewerChildren - viewerTeenagers;
 
@@ -91,7 +91,7 @@ public class MonthlyReportService(SettingsService settingsService, IMovieProvide
         document.ReplaceText(new StringReplaceTextOptions 
             { SearchValue = "{{viewer_adults}}", NewValue = viewerAdults.ToString() }); 
         
-        var newFileName = $"Таблица отчетности в УК {System.Globalization.DateTimeFormatInfo.CurrentInfo.GetMonthName(from.Month)} {from:yyyy}г.pdf";
+        var newFileName = $"Таблица отчетности в УК {System.Globalization.DateTimeFormatInfo.CurrentInfo.GetMonthName(from.Month)} {from:yyyy}г.docx";
         var newFilePath = Path.Combine(GetSessionPath(from, to), newFileName);
         document.SaveAs(newFilePath);
 
@@ -107,7 +107,7 @@ public class MonthlyReportService(SettingsService settingsService, IMovieProvide
         string currentMovieTitle = string.Empty;
 
         // Пропускаем первые 4 строки (заголовки)
-        foreach (var row in worksheet.RowsUsed().Skip(4))
+        foreach (var row in worksheet.Rows().Skip(4))
         {
             var firstCell = row.Cell(1);
             var firstCellValue = firstCell.GetValue<string>().Trim();
