@@ -7,18 +7,7 @@
         mc:Ignorable="d"
         Title="Cinema Control" Height="700" Width="900">
     <Grid>
-        <TabControl Margin="0,0,0,-1">
-            <TabItem Header="Еженедельный отчет">
-                <local:WeeklyReportView/>
-            </TabItem>
-            <TabItem Header="Ежемесячный отчет">
-                <local:MonthlyReportView/>
-            </TabItem>
-            <TabItem Header="Ежеквартальный отчет">
-                <local:QuarterlyReportView/>
-            </TabItem>
-            <!-- Другие вкладки могут быть добавлены здесь -->
-        </TabControl>
+        <TabControl x:Name="MainTabControl" Margin="0,0,0,-1"/>
 
         <Button x:Name="SettingsButton" 
                 Width="30" Height="30" 

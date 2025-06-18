@@ -3,20 +3,20 @@ using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using CinemaControl.Services.Weekly;
+using CinemaControl.Services;
 using Microsoft.Playwright;
 
 namespace CinemaControl;
 
-public partial class WeeklyReportView
+public partial class ReportView
 {
-    private readonly IWeeklyReportService _reportService;
+    private readonly IReportService _reportService;
     private string? _currentReportFolderPath;
 
-    public WeeklyReportView()
+    public ReportView(IReportService reportService)
     {
         InitializeComponent();
-        _reportService = new CompositeWeeklyReportService([new WeeklyRentalsReportService(ReportProgressBar), new WeeklyCashierReportService(ReportProgressBar), new WeeklyCardReportService(ReportProgressBar)]);
+        _reportService = reportService;
         // Clear placeholder items
         DownloadedFilesListBox.Items.Clear();
         InitializeWebView();
@@ -25,7 +25,7 @@ public partial class WeeklyReportView
 
     private async void InitializeWebView()
     {
-        await PdfViewer.EnsureCoreWebView2Async(null);
+        await WebView.EnsureCoreWebView2Async(null);
     }
 
     private async void GenerateReport_Click(object sender, RoutedEventArgs e)
@@ -46,8 +46,6 @@ public partial class WeeklyReportView
         }
 
         IsEnabled = false;
-        ReportProgressBar.Maximum = _reportService.GetFilesCount(startDate.Value, endDate.Value);
-        ProgressPanel.Visibility = Visibility.Visible;
         DownloadedFilesListBox.Items.Clear();
         _currentReportFolderPath = null;
         OpenFolderIcon.Visibility = Visibility.Collapsed;
@@ -59,7 +57,7 @@ public partial class WeeklyReportView
             var page = await browser.NewPageAsync();
             _currentReportFolderPath = await _reportService.GenerateReportFiles(startDate.Value, endDate.Value, page);
                 
-            var filePaths = Directory.EnumerateFiles(_currentReportFolderPath, "*.pdf");
+            var filePaths = Directory.EnumerateFiles(_currentReportFolderPath);
 
             foreach (var path in filePaths.OrderBy(p => p))
             {
@@ -83,8 +81,6 @@ public partial class WeeklyReportView
         finally
         {
             IsEnabled = true;
-            ProgressPanel.Visibility = Visibility.Collapsed;
-            ProgressText.Text = "Загрузка...";
         }
     }
         
@@ -108,9 +104,9 @@ public partial class WeeklyReportView
         if (DownloadedFilesListBox.SelectedItem is ListBoxItem selectedItem)
         {
             var filePath = selectedItem.Tag as string;
-            if (!string.IsNullOrEmpty(filePath) && File.Exists(filePath) && PdfViewer?.CoreWebView2 != null)
+            if (!string.IsNullOrEmpty(filePath) && File.Exists(filePath) && WebView?.CoreWebView2 != null)
             {
-                PdfViewer.CoreWebView2.Navigate(filePath);
+                WebView.CoreWebView2.Navigate(filePath);
             }
         }
     }
@@ -132,10 +128,5 @@ public partial class WeeklyReportView
                 }
             }
         }
-    }
-
-    private void ReportProgressBar_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-    {
-        ProgressText.Text = $"Загрузка {ReportProgressBar.Value}/{ReportProgressBar.Maximum}";
     }
 }

@@ -7,6 +7,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <UseWPF>true</UseWPF>
         <CETCompat>false</CETCompat>
+        <EnableWindowsTargeting>true</EnableWindowsTargeting>
     </PropertyGroup>
 
     <ItemGroup>
@@ -26,6 +27,14 @@
     <ItemGroup>
       <None Remove="Assets\MonthlyReportTemplate.docx" />
       <AdditionalFiles Include="Assets\MonthlyReportTemplate.docx" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Page Update="ReportView.xaml">
+        <Generator>MSBuild:Compile</Generator>
+        <XamlRuntime>Wpf</XamlRuntime>
+        <SubType>Designer</SubType>
+      </Page>
     </ItemGroup>
 
 </Project>
