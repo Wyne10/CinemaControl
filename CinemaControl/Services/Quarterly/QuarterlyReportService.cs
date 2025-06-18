@@ -53,7 +53,7 @@ public class QuarterlyReportService(SettingsService settingsService) : ReportSer
             row.CopyTo(worksheet.Row(currentRowNumber + 1));
 
             row.Cell("A").Value = currentRowNumber - 14;
-            row.Cell("B").Value = movieData.MovieName;
+            row.Cell("B").Value = $"{movieData.MovieName} {movieData.ScreenType}";
             row.Cell("G").Value = movieData.SessionCount;
             row.Cell("H").Value = movieData.ViewerCount;
             row.Cell("I").Value = movieData.Gross;
