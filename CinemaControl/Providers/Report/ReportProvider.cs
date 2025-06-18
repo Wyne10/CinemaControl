@@ -9,7 +9,6 @@ public class ReportProvider : IReportProvider
         await frame.Locator(IReportProvider.ViewReportButtonSelector).ClickAsync();
         await page.WaitForLoadStateAsync(LoadState.NetworkIdle);
         await frame.Locator(IReportProvider.ExportMenuLinkSelector).ClickAsync();
-        await page.WaitForLoadStateAsync(LoadState.NetworkIdle);
         await frame.Locator(saveType.Selector).WaitForAsync();
             
         var downloadTask = page.WaitForDownloadAsync();
