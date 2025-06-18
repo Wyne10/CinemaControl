@@ -18,7 +18,7 @@ public class WeeklyCardReportService(ProgressBar progressBar) : WeeklyReportServ
         await page.GotoAsync(ReportUrl);
         var frame = await GetFrame(page);
 
-        var newFileName = $"По пушкинской {from:dd-MM-yy} - {to:dd-MM-yy}.pdf";
+        var newFileName = $"По пушкинской {from:dd.MM.yy} - {to:dd.MM.yy}.pdf";
         var newFilePath = Path.Combine(sessionPath, newFileName);
         var reportProvider = new PeriodReportProvider(from, to);
         var download = await reportProvider.DownloadReport(page, frame, ReportSaveType.Pdf);

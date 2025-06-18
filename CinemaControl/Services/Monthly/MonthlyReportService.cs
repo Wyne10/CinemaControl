@@ -13,6 +13,7 @@ namespace CinemaControl.Services.Monthly;
 public class MonthlyReportService(SettingsService settingsService, IMovieProvider movieProvider) : ReportService
 {
     private const string ReportUrl = "http://192.168.0.254/CinemaWeb/Report/Render?path=RentalReports%2FGrossMovieByPeriod";
+    private const string CardReportUrl = "http://192.168.0.254/CinemaWeb/Report/Render?path=RentalReports%2FMovieByPeriodPushkin";
 
     public override async Task<string> GenerateReportFiles(DateTime from, DateTime to, IPage page)
     {
@@ -28,12 +29,12 @@ public class MonthlyReportService(SettingsService settingsService, IMovieProvide
         await download.SaveAsAsync(newFilePath);
 
         var grossMovieData = ParseGrossMovieData(newFilePath);
-        await FillMonthlyReport(grossMovieData, from, to);
+        await FillMonthlyReport(grossMovieData, from, to, page);
 
         return sessionPath;
     }
 
-    private async Task<string> FillMonthlyReport(IReadOnlyCollection<GrossMovieData> grossMovieData, DateTime from, DateTime to)
+    private async Task<string> FillMonthlyReport(IReadOnlyCollection<GrossMovieData> grossMovieData, DateTime from, DateTime to, IPage page)
     {
         var templatePath = settingsService.Settings.MonthlyReportTemplatePath;
         if (string.IsNullOrWhiteSpace(templatePath))
@@ -70,7 +71,8 @@ public class MonthlyReportService(SettingsService settingsService, IMovieProvide
             { SearchValue = "{{viewer_total}}", NewValue = viewerTotal.ToString() });
         document.ReplaceText(new StringReplaceTextOptions 
             { SearchValue = "{{movie_russian}}", NewValue = russianMovies.Count.ToString() });
-        // TODO Зрители по пушкинской карте
+        document.ReplaceText(new StringReplaceTextOptions 
+            { SearchValue = "{{viewer_card}}", NewValue = (await GetCardViewerCount(from, to, page)).ToString() });
         document.ReplaceText(new StringReplaceTextOptions 
             { SearchValue = "{{session_russian}}", NewValue = russianMovies.Sum(data => data.SessionCount).ToString() });
         document.ReplaceText(new StringReplaceTextOptions 
@@ -144,6 +146,25 @@ public class MonthlyReportService(SettingsService settingsService, IMovieProvide
         }
 
         return grossMovieData;
+    }
+
+    private async Task<int> GetCardViewerCount(DateTime from, DateTime to, IPage page)
+    {
+        var sessionPath = GetSessionPath(from, to);
+        
+        await page.GotoAsync(CardReportUrl);
+        var frame = await GetFrame(page);
+
+        var newFileName = $"По пушкинской {from:dd.MM.yy} - {to:dd.MM.yy}.pdf";
+        var newFilePath = Path.Combine(sessionPath, newFileName);
+        var reportProvider = new PeriodReportProvider(from, to);
+        var download = await reportProvider.DownloadReport(page, frame, ReportSaveType.Excel);
+        await download.SaveAsAsync(newFilePath);
+        
+        using var workbook = new XLWorkbook(newFilePath);
+        var worksheet = workbook.Worksheets.First();
+        
+        return worksheet.LastRowUsed()?.Cell(4).GetValue<int>() ?? 0;
     }
 
 }

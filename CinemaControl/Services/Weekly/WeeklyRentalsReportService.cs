@@ -29,7 +29,7 @@ public class WeeklyRentalsReportService(ProgressBar progressBar) : WeeklyReportS
 
             await frame.Locator(ShowRentalsSelector).SelectOptionAsync(["1"]);
 
-            var newFileName = $"сводный кассовый {date:dd-MM-yy}.pdf";
+            var newFileName = $"Сводный кассовый {date:dd.MM.yy}.pdf";
             var newFilePath = Path.Combine(sessionPath, newFileName);
             var reportProvider = new SingleReportProvider(date);
             var download = await reportProvider.DownloadReport(page, frame, ReportSaveType.Pdf);

@@ -26,7 +26,7 @@ public class WeeklyCashierReportService(ProgressBar progressBar) : WeeklyReportS
             await page.GotoAsync(ReportUrl);
             var frame = await GetFrame(page);
 
-            var newFileName = $"Разбивкой по кассирам {date:dd-MM-yy}.pdf";
+            var newFileName = $"Разбивкой по кассирам {date:dd.MM.yy}.pdf";
             var newFilePath = Path.Combine(sessionPath, newFileName);
             var reportProvider = new SingleReportProvider(date, "input[name=\"ReportViewer1$ctl04$ctl03$txtValue\"]");
             var download = await reportProvider.DownloadReport(page, frame, ReportSaveType.Pdf);
