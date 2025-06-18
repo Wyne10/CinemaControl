@@ -8,9 +8,29 @@ public class ReportProvider : IReportProvider
     {
         await frame.Locator(IReportProvider.ViewReportButtonSelector).ClickAsync();
         await page.WaitForLoadStateAsync(LoadState.NetworkIdle);
-        await frame.Locator(IReportProvider.ExportMenuLinkSelector).ClickAsync();
-        await frame.Locator(saveType.Selector).WaitForAsync();
-            
+
+        const int maxRetries = 5;
+        bool exportMenuClicked = false;
+        for (int i = 0; i < maxRetries; i++)
+        {
+            await frame.Locator(IReportProvider.ExportMenuLinkSelector).ClickAsync();
+            try
+            {
+                await frame.Locator(saveType.Selector).WaitForAsync(new() { Timeout = 1000 });
+                exportMenuClicked = true;
+                break;
+            }
+            catch (TimeoutException)
+            {
+                // Ignore timeout and retry
+            }
+        }
+
+        if (!exportMenuClicked)
+        {
+            throw new Exception("Не удалось открыть меню экспорта после нескольких попыток.");
+        }
+
         var downloadTask = page.WaitForDownloadAsync();
         await frame.Locator(saveType.Selector).ClickAsync();
 
