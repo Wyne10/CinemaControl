@@ -164,7 +164,10 @@ public class MonthlyReportService(SettingsService settingsService, IMovieProvide
         using var workbook = new XLWorkbook(newFilePath);
         var worksheet = workbook.Worksheets.First();
         
-        return worksheet.LastRowUsed()?.Cell(4).GetValue<int>() ?? 0;
+        var lastRow = worksheet.LastRowUsed();
+        if (lastRow == null || lastRow.Cell(4).IsEmpty())
+            return 0;
+        return lastRow.Cell(4).GetValue<int>();
     }
 
 }
