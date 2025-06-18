@@ -64,10 +64,12 @@ public class QuarterlyReportService(SettingsService settingsService) : ReportSer
 
             var remunerationCell = row.Cell("K");
             remunerationCell.FormulaA1 = $"I{currentRowNumber}*J{currentRowNumber}";
+            worksheet.Row(currentRowNumber + 2).Cell("I").FormulaA1 = $"SUM(I15:I{currentRowNumber})";
+            worksheet.Row(currentRowNumber + 2).Cell("K").FormulaA1 = $"SUM(K15:K{currentRowNumber})";
             currentRowNumber++;
         }
         
-        var newFileName = $"Отчет об использовании аудиовизуальных произведений {from:dd-MM-yy} - {to:dd-MM-yy}.xlsx";
+        var newFileName = $"Отчет об использовании аудиовизуальных произведений {from:dd.MM.yy} - {to:dd.MM.yy}.xlsx";
         var newFilePath = Path.Combine(GetSessionPath(from, to), newFileName);
         workbook.SaveAs(newFilePath);
 
