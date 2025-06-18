@@ -135,7 +135,7 @@ public class MonthlyReportService(SettingsService settingsService, IMovieProvide
                     var movieData = new GrossMovieData
                     (
                         currentMovieTitle[..^2].Trim(),
-                        currentMovieTitle.Substring(currentMovieTitle.Length - 3, currentMovieTitle.Length),
+                        currentMovieTitle.Substring(currentMovieTitle.Length - 3, 2),
                         row.Cell(2).GetValue<int>(),
                         row.Cell(3).GetValue<int>(),
                         row.Cell(4).GetValue<int>()
