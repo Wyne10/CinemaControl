@@ -12,8 +12,7 @@ namespace CinemaControl.Services.Monthly;
 
 public class MonthlyReportService(SettingsService settingsService, IMovieProvider movieProvider) : ReportService
 {
-    private const string ReportUrl =
-        "http://192.168.0.254/CinemaWeb/Report/Render?path=RentalReports%2FGrossMovieByPeriod";
+    private const string ReportUrl = "http://192.168.0.254/CinemaWeb/Report/Render?path=RentalReports%2FGrossMovieByPeriod";
 
     public override async Task<string> GenerateReportFiles(DateTime from, DateTime to, IPage page)
     {
