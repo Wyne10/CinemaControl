@@ -1,15 +1,12 @@
 using System.IO;
-using System.Windows.Controls;
 using CinemaControl.Providers.Report;
 using Microsoft.Playwright;
 
-namespace CinemaControl.Services.Weekly;
+namespace CinemaControl.Services.Monthly;
 
-public class WeeklyCardReportService(ProgressBar progressBar) : WeeklyReportService(progressBar)
+public class MonthlyPaymentReportService : ReportService
 {
-    private const string ReportUrl = "http://192.168.0.254/CinemaWeb/Report/Render?path=RentalReports%2FMovieByPeriodPushkin";
-
-    public override int GetFilesCount(DateTime from, DateTime to) => 1;
+    private const string ReportUrl = "http://192.168.0.254/CinemaWeb/Report/Render?path=CashReports%2FPaymentTypesByPeriod";
 
     public override async Task<string> GenerateReportFiles(DateTime from, DateTime to, IPage page)
     {
@@ -18,14 +15,12 @@ public class WeeklyCardReportService(ProgressBar progressBar) : WeeklyReportServ
         await page.GotoAsync(ReportUrl);
         var frame = await GetFrame(page);
 
-        var newFileName = $"По пушкинской {from:dd-MM-yy} - {to:dd-MM-yy}.pdf";
+        var newFileName = $"По видам оплат {System.Globalization.DateTimeFormatInfo.CurrentInfo.GetMonthName(from.Month)} {from.Year}.pdf";
         var newFilePath = Path.Combine(sessionPath, newFileName);
         var reportProvider = new PeriodReportProvider(from, to);
         var download = await reportProvider.DownloadReport(page, frame, ReportSaveType.Pdf);
         await download.SaveAsAsync(newFilePath);
         
-        ProgressBar.Value++;
-
         return sessionPath;
     }
 }

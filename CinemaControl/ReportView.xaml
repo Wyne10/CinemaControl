@@ -60,10 +60,7 @@
             <Border BorderBrush="Gray" BorderThickness="1">
                 <Grid>
                     <wv2:WebView2 Name="WebView" Visibility="Collapsed"/>
-                    <DataGrid Name="ExcelDataGrid" Visibility="Collapsed" IsReadOnly="True" AutoGenerateColumns="True"/>
-                    <ScrollViewer Name="WordScrollViewer" Visibility="Collapsed">
-                        <TextBlock Name="WordTextBlock" TextWrapping="Wrap" Padding="5"/>
-                    </ScrollViewer>
+                    <DataGrid Name="ExcelDataGrid" HeadersVisibility="None" Visibility="Collapsed" IsReadOnly="True" AutoGenerateColumns="True"/>
                 </Grid>
             </Border>
         </DockPanel>

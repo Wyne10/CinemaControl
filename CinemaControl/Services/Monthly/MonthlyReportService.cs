@@ -21,7 +21,7 @@ public class MonthlyReportService(SettingsService settingsService, IMovieProvide
         await page.GotoAsync(ReportUrl);
         var frame = await GetFrame(page);
 
-        var newFileName = $"по сборам за период {from:yyyy-MM-dd} - {to:yyyy-MM-dd}.xlsx";
+        var newFileName = $"По сборам за период {from:dd.MM.yy} - {to:dd.MM.yy}.xlsx";
         var newFilePath = Path.Combine(sessionPath, newFileName);
         var reportProvider = new PeriodReportProvider(from, to);
         var download = await reportProvider.DownloadReport(page, frame, ReportSaveType.Excel);

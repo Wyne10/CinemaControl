@@ -6,7 +6,6 @@ using System.Windows.Input;
 using CinemaControl.Services;
 using Microsoft.Playwright;
 using ClosedXML.Excel;
-using Xceed.Words.NET;
 using System.Data;
 
 namespace CinemaControl;
@@ -106,7 +105,6 @@ public partial class ReportView
     {
         WebView.Visibility = Visibility.Collapsed;
         ExcelDataGrid.Visibility = Visibility.Collapsed;
-        WordScrollViewer.Visibility = Visibility.Collapsed;
     }
 
     private void DownloadedFilesListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -129,11 +127,6 @@ public partial class ReportView
                         WebView.Visibility = Visibility.Visible;
                         WebView.CoreWebView2.Navigate(filePath);
                     }
-                    break;
-                case ".docx":
-                    var doc = DocX.Load(filePath);
-                    WordTextBlock.Text = doc.Text;
-                    WordScrollViewer.Visibility = Visibility.Visible;
                     break;
                 case ".xlsx":
                     using (var workbook = new XLWorkbook(filePath))
@@ -172,20 +165,24 @@ public partial class ReportView
 
     private void DownloadedFilesListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
     {
-        if (DownloadedFilesListBox.SelectedItem is ListBoxItem selectedItem)
+        if (DownloadedFilesListBox.SelectedItem is not ListBoxItem selectedItem) return;
+        var filePath = selectedItem.Tag as string;
+        if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath)) return;
+        OpenFile(filePath);
+    }
+
+    private static void OpenFile(string filePath)
+    {
+        if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath)) return;
+        
+        try
         {
-            var filePath = selectedItem.Tag as string;
-            if (!string.IsNullOrEmpty(filePath) && File.Exists(filePath))
-            {
-                try
-                {
-                    Process.Start(new ProcessStartInfo(filePath) { UseShellExecute = true });
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Не удалось открыть файл: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
-            }
+            Process.Start(new ProcessStartInfo(filePath) { UseShellExecute = true });
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Не удалось открыть файл: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
+    
 }
