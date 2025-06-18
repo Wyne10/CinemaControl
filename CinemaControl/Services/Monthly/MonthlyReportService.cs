@@ -5,8 +5,8 @@ using CinemaControl.Providers.Movie;
 using CinemaControl.Providers.Report;
 using Microsoft.Playwright;
 using ClosedXML.Excel;
-using Xceed.Document.NET;
-using Xceed.Words.NET;
+using SautinSoft.Document;
+using System.Text.RegularExpressions;
 
 namespace CinemaControl.Services.Monthly;
 
@@ -42,7 +42,7 @@ public class MonthlyReportService(SettingsService settingsService, IMovieProvide
             throw new Exception("Не установлен путь к шаблону ежемесячного отчета.");
         }
 
-        using var document = DocX.Load(templatePath);
+        var document = DocumentCore.Load(templatePath);
 
         var movies = await movieProvider.GetMovies(grossMovieData.Select(data => data.MovieName));
         var russianMovies = grossMovieData.Where(data => movies[data.MovieName].IsRussian()).ToImmutableHashSet();
@@ -61,43 +61,38 @@ public class MonthlyReportService(SettingsService settingsService, IMovieProvide
         var sessionAdults = sessionTotal - sessionChildren - sessionTeenagers;
         var viewerAdults = viewerTotal - viewerChildren - viewerTeenagers;
 
-        document.ReplaceText(new StringReplaceTextOptions
-            { SearchValue = "{{month}}", NewValue = System.Globalization.DateTimeFormatInfo.CurrentInfo.GetMonthName(from.Month) });
-        document.ReplaceText(new StringReplaceTextOptions
-            { SearchValue = "{{year}}", NewValue = from.Year.ToString() }); 
-        document.ReplaceText(new StringReplaceTextOptions 
-            { SearchValue = "{{session_total}}", NewValue = sessionTotal.ToString() });
-        document.ReplaceText(new StringReplaceTextOptions 
-            { SearchValue = "{{viewer_total}}", NewValue = viewerTotal.ToString() });
-        document.ReplaceText(new StringReplaceTextOptions 
-            { SearchValue = "{{movie_russian}}", NewValue = russianMovies.Count.ToString() });
-        // TODO Зрители по пушкинской карте
-        document.ReplaceText(new StringReplaceTextOptions 
-            { SearchValue = "{{session_russian}}", NewValue = russianMovies.Sum(data => data.SessionCount).ToString() });
-        document.ReplaceText(new StringReplaceTextOptions 
-            { SearchValue = "{{viewer_russian}}", NewValue = russianMovies.Sum(data => data.ViewerCount).ToString() });
-        document.ReplaceText(new StringReplaceTextOptions 
-            { SearchValue = "{{movie_foreign}}", NewValue = foreignMovies.Count.ToString() });
-        document.ReplaceText(new StringReplaceTextOptions 
-            { SearchValue = "{{session_foreign}}", NewValue = foreignMovies.Sum(data => data.SessionCount).ToString() });
-        document.ReplaceText(new StringReplaceTextOptions 
-            { SearchValue = "{{viewer_foreign}}", NewValue = foreignMovies.Sum(data => data.ViewerCount).ToString() });
-        document.ReplaceText(new StringReplaceTextOptions 
-            { SearchValue = "{{session_children}}", NewValue = sessionChildren.ToString() });
-        document.ReplaceText(new StringReplaceTextOptions 
-            { SearchValue = "{{viewer_children}}", NewValue = viewerChildren.ToString() }); 
-        document.ReplaceText(new StringReplaceTextOptions 
-            { SearchValue = "{{session_teenagers}}", NewValue = sessionTeenagers.ToString() });
-        document.ReplaceText(new StringReplaceTextOptions 
-            { SearchValue = "{{viewer_teenagers}}", NewValue = viewerTeenagers.ToString() });
-        document.ReplaceText(new StringReplaceTextOptions 
-            { SearchValue = "{{session_adults}}", NewValue = sessionAdults.ToString() });
-        document.ReplaceText(new StringReplaceTextOptions 
-            { SearchValue = "{{viewer_adults}}", NewValue = viewerAdults.ToString() }); 
+        var replacements = new Dictionary<string, string>
+        {
+            { "{{month}}", System.Globalization.DateTimeFormatInfo.CurrentInfo.GetMonthName(from.Month) },
+            { "{{year}}", from.Year.ToString() },
+            { "{{session_total}}", sessionTotal.ToString() },
+            { "{{viewer_total}}", viewerTotal.ToString() },
+            { "{{movie_russian}}", russianMovies.Count.ToString() },
+            { "{{session_russian}}", russianMovies.Sum(data => data.SessionCount).ToString() },
+            { "{{viewer_russian}}", russianMovies.Sum(data => data.ViewerCount).ToString() },
+            { "{{movie_foreign}}", foreignMovies.Count.ToString() },
+            { "{{session_foreign}}", foreignMovies.Sum(data => data.SessionCount).ToString() },
+            { "{{viewer_foreign}}", foreignMovies.Sum(data => data.ViewerCount).ToString() },
+            { "{{session_children}}", sessionChildren.ToString() },
+            { "{{viewer_children}}", viewerChildren.ToString() },
+            { "{{session_teenagers}}", sessionTeenagers.ToString() },
+            { "{{viewer_teenagers}}", viewerTeenagers.ToString() },
+            { "{{session_adults}}", sessionAdults.ToString() },
+            { "{{viewer_adults}}", viewerAdults.ToString() }
+        };
+
+        foreach (var (placeholder, value) in replacements)
+        {
+            Regex regex = new Regex(Regex.Escape(placeholder), RegexOptions.IgnoreCase);
+            foreach (var range in document.Content.Find(regex).Reverse())
+            {
+                range.Replace(value);
+            }
+        }
         
         var newFileName = $"Таблица отчетности в УК {System.Globalization.DateTimeFormatInfo.CurrentInfo.GetMonthName(from.Month)} {from:yyyy}г.docx";
         var newFilePath = Path.Combine(GetSessionPath(from, to), newFileName);
-        document.SaveAs(newFilePath);
+        document.Save(newFilePath);
 
         return newFilePath;
     }

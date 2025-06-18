@@ -9,11 +9,10 @@ public class PeriodReportProvider(DateTime from, DateTime to) : ReportProvider
     
     public override async Task<IDownload> DownloadReport(IPage page, IFrameLocator frame, ReportSaveType saveType)
     {
-        var dateFromString = from.ToString("dd.MM.yyyy 0:00:00");
-        await frame.Locator(DateFromInputSelector).FillAsync(dateFromString);
-        await page.WaitForLoadStateAsync(LoadState.NetworkIdle);
         var dateToString = to.ToString("dd.MM.yyyy 0:00:00");
         await frame.Locator(DateToInputSelector).FillAsync(dateToString);
+        var dateFromString = from.ToString("dd.MM.yyyy 0:00:00");
+        await frame.Locator(DateFromInputSelector).FillAsync(dateFromString);
         
         return await base.DownloadReport(page, frame, saveType);
     }
