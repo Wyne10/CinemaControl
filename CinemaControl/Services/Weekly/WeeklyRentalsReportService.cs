@@ -27,7 +27,7 @@ public class WeeklyRentalsReportService(ProgressBar progressBar) : WeeklyReportS
             await page.GotoAsync(ReportUrl);
             var frame = await GetFrame(page);
 
-            await frame.SelectOptionAsync(ShowRentalsSelector, new[] { "1" });
+            await frame.Locator(ShowRentalsSelector).SelectOptionAsync(["1"]);
 
             var newFileName = $"сводный кассовый {date:yyyy-MM-dd}.pdf";
             var newFilePath = Path.Combine(sessionPath, newFileName);

@@ -18,27 +18,17 @@ public abstract class ReportService : IReportService
         return sessionPath;
     }
 
-    protected async Task<IFrame> GetFrame(IPage page)
+    protected async Task<IFrameLocator> GetFrame(IPage page)
     {
         if (await page.Locator(UserNameSelector).IsVisibleAsync())
         {
-            await page.FillAsync(UserNameSelector, "Администратор");
-            await page.ClickAsync(LogInSelector);
+            await page.Locator(UserNameSelector).FillAsync("Администратор");
+            await page.Locator(LogInSelector).ClickAsync();
         }
         
-        var iframeElement = await page.WaitForSelectorAsync("iframe", new() { Timeout = 30000 });
-        if (iframeElement == null)
-        {
-            throw new Exception("Превышено время ожидания.");
-        }
+        var frameLocator = page.FrameLocator("iframe");
 
-        var frame = await iframeElement.ContentFrameAsync();
-        if (frame == null)
-        {
-            throw new Exception("Не удалось получить контекст iframe. Возможно, он еще не загрузился.");
-        }
-
-        return frame;
+        return frameLocator;
     }
 
     public abstract Task<string> GenerateReportFiles(DateTime from, DateTime to, IPage page);

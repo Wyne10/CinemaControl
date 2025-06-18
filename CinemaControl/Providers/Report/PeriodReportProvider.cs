@@ -7,13 +7,13 @@ public class PeriodReportProvider(DateTime from, DateTime to) : ReportProvider
     private const string DateFromInputSelector = "input[name=\"ReportViewer1$ctl04$ctl03$txtValue\"]";
     private const string DateToInputSelector = "input[name=\"ReportViewer1$ctl04$ctl05$txtValue\"]";
     
-    public override async Task<IDownload> DownloadReport(IPage page, IFrame frame, ReportSaveType saveType)
+    public override async Task<IDownload> DownloadReport(IPage page, IFrameLocator frame, ReportSaveType saveType)
     {
         var dateFromString = from.ToString("dd.MM.yyyy 0:00:00");
-        await frame.FillAsync(DateFromInputSelector, dateFromString);
+        await frame.Locator(DateFromInputSelector).FillAsync(dateFromString);
         
         var dateToString = to.ToString("dd.MM.yyyy 0:00:00");
-        await frame.FillAsync(DateToInputSelector, dateToString);
+        await frame.Locator(DateToInputSelector).FillAsync(dateToString);
         
         return await base.DownloadReport(page, frame, saveType);
     }
