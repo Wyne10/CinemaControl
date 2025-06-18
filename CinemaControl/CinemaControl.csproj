@@ -27,6 +27,8 @@
     <ItemGroup>
       <None Remove="Assets\MonthlyReportTemplate.docx" />
       <AdditionalFiles Include="Assets\MonthlyReportTemplate.docx" />
+      <None Remove="Assets\QuarterlyReportTemplate.xlsx" />
+      <AdditionalFiles Include="Assets\QuarterlyReportTemplate.xlsx" />
     </ItemGroup>
 
     <ItemGroup>

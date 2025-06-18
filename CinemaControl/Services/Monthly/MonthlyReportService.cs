@@ -103,7 +103,7 @@ public class MonthlyReportService(SettingsService settingsService, IMovieProvide
         return newFilePath;
     }
 
-    private static HashSet<GrossMovieData> ParseGrossMovieData(string grossReportFilePath)
+    public static HashSet<GrossMovieData> ParseGrossMovieData(string grossReportFilePath)
     {
         var grossMovieData = new HashSet<GrossMovieData>();
         using var workbook = new XLWorkbook(grossReportFilePath);
@@ -169,5 +169,4 @@ public class MonthlyReportService(SettingsService settingsService, IMovieProvide
             return 0;
         return lastRow.Cell(4).GetValue<int>();
     }
-
 }

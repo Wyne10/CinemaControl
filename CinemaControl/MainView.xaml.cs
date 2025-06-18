@@ -3,6 +3,7 @@ using System.Windows.Controls;
 using CinemaControl.Providers.Movie;
 using CinemaControl.Services;
 using CinemaControl.Services.Monthly;
+using CinemaControl.Services.Quarterly;
 
 namespace CinemaControl;
 
@@ -17,6 +18,7 @@ public partial class MainView
         var movieProvider = new MovieProvider(_settingsService);
         AddTab("Еженедельный отчет", new WeeklyReportView());
         AddTab("Ежемесячный отчет", new ReportView(new CompositeReportService([new MonthlyReportService(_settingsService, movieProvider), new MonthlyPaymentReportService()])));
+        AddTab("Ежеквартальный отчет", new ReportView(new QuarterlyReportService(_settingsService)));
     }
 
     private void AddTab(string header, UserControl reportView)
