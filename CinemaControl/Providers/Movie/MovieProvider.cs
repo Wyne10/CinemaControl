@@ -26,25 +26,26 @@ public class MovieProvider : IMovieProvider
         Directory.CreateDirectory(appFolderPath);
         _movieCacheFilePath = Path.Combine(appFolderPath, "movies.json");
             
-        _movieCache = LoadMovieCache(); 
+        _movieCache = LoadMovieCache();
     }
-
-    public async Task<bool> IsRussian(string movieName) =>
-        (_movieCache!.GetValueOrDefault(movieName, WriteMovieCache(movieName, await FetchMovieData(movieName)))?.Countries ?? Enumerable.Empty<Country>()).Any(c => c.Name == "Россия");
-
-    public async Task<bool> IsChildrenAvailable(string movieName) =>
-        _movieCache!.GetValueOrDefault(movieName, WriteMovieCache(movieName, await FetchMovieData(movieName)))?.AgeRating <= 6;
 
     public async Task<Dictionary<string, Dtos.Movie>> GetMovies(IEnumerable<string> movieNames)
     {
         var movies = new Dictionary<string, Dtos.Movie>();
         foreach (var movieName in movieNames)
         {
-            var movie = _movieCache!.GetValueOrDefault(movieName, WriteMovieCache(movieName, await FetchMovieData(movieName)));
+            var movie = await GetMovie(movieName);
             if (movie != null)
                 movies[movieName] = movie;
         }
         return movies;
+    }
+
+    private async Task<Dtos.Movie?> GetMovie(string movieName)
+    {
+        if (_movieCache.TryGetValue(movieName, out var movie))
+            return movie;
+        return WriteMovieCache(movieName, await FetchMovieData(movieName));
     }
 
     private async Task<Dtos.Movie?> FetchMovieData(string movieName)
