@@ -121,7 +121,7 @@ public class MonthlyReportService(SettingsService settingsService, IMovieProvide
             {
                 if (firstCellValue.ToLower() != "итог")
                 {
-                    currentMovieTitle = firstCellValue;
+                    currentMovieTitle = firstCellValue[..^2].Trim();
                 }
             }
             
