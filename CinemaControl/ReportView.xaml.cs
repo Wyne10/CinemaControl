@@ -55,7 +55,7 @@ public partial class ReportView
         try
         {
             using var playwright = await Playwright.CreateAsync();
-            await using var browser = await playwright.Chromium.LaunchAsync(new() { Headless = false });
+            await using var browser = await playwright.Chromium.LaunchAsync(new() { Headless = true });
             var page = await browser.NewPageAsync();
             _currentReportFolderPath = await _reportService.GenerateReportFiles(startDate.Value, endDate.Value, page);
                 
