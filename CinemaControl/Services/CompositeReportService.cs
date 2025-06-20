@@ -6,7 +6,12 @@ public class CompositeReportService(IEnumerable<IReportService> reportServices) 
 {
     public override async Task<string> GenerateReportFiles(DateTime from, DateTime to, IPage page)
     {
-        foreach(IReportService reportService in reportServices) await reportService.GenerateReportFiles(from, to, page);
+        foreach (IReportService reportService in reportServices)
+        {
+            reportService.OnDownloadProgress += ProgressDownload;
+            await reportService.GenerateReportFiles(from, to, page);
+            reportService.OnDownloadProgress -= ProgressDownload;
+        }
         return GetSessionPath(from, to);
     }
 }
