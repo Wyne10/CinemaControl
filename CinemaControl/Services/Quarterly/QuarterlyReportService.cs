@@ -14,6 +14,7 @@ public class QuarterlyReportService(SettingsService settingsService) : ReportSer
     public override async Task<string> GenerateReportFiles(DateTime from, DateTime to, IPage page)
     {
         var sessionPath = GetSessionPath(from, to);
+        Directory.CreateDirectory(sessionPath);
 
         await page.GotoAsync(ReportUrl);
         var frame = await GetFrame(page);

@@ -11,6 +11,7 @@ public class WeeklyCashierReportService : ReportService
     public override async Task<string> GenerateReportFiles(DateTime from, DateTime to, IPage page)
     {
         var sessionPath = GetSessionPath(from, to);
+        Directory.CreateDirectory(sessionPath);
 
         for (var date = from; date <= to; date = date.AddDays(1))
         {
