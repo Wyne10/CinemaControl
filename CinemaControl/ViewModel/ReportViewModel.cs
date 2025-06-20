@@ -129,7 +129,7 @@ public class ReportViewModel(IReportService reportService) : INotifyPropertyChan
             return;
         }
 
-        Active = false;
+        //Active = false;
 
         try
         {
