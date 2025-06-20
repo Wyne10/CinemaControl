@@ -6,6 +6,6 @@
         mc:Ignorable="d"
         Title="Cinema Control" Height="700" Width="900">
     <Grid>
-        <TabControl ItemsSource="{Binding Tabs}" Margin="0,0,0,-1"/>
+        <TabControl SelectedIndex="0" ItemsSource="{Binding Tabs}" Margin="0,0,0,-1"/>
     </Grid>
 </Window>

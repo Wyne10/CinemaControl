@@ -103,7 +103,6 @@ public partial class ReportView
     private void HideAllPreviewers()
     {
         WebView.Visibility = Visibility.Collapsed;
-        ExcelDataGrid.Visibility = Visibility.Collapsed;
     }
 
     private void DownloadedFilesListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -150,9 +149,7 @@ public partial class ReportView
                             }
                             dt.Rows.Add(newRow);
                         }
-                        ExcelDataGrid.ItemsSource = dt.DefaultView;
                     }
-                    ExcelDataGrid.Visibility = Visibility.Visible;
                     break;
             }
         }

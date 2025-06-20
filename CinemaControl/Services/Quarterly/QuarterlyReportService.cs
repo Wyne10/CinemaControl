@@ -24,8 +24,12 @@ public class QuarterlyReportService(SettingsService settingsService) : ReportSer
         var download = await reportProvider.DownloadReport(page, frame, ReportSaveType.Excel);
         await download.SaveAsAsync(newFilePath);
 
+        ProgressDownload();
+        
         var grossMovieData = MonthlyReportService.ParseGrossMovieData(newFilePath);
         FillQuarterlyReport(grossMovieData, from, to);
+        
+        ProgressDownload();
 
         return sessionPath;
     } 

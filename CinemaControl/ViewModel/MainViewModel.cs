@@ -5,6 +5,7 @@ using CinemaControl.Providers.Movie;
 using CinemaControl.Services;
 using CinemaControl.Services.Monthly;
 using CinemaControl.Services.Quarterly;
+using CinemaControl.Services.Weekly;
 
 namespace CinemaControl.ViewModel;
 
@@ -15,7 +16,7 @@ public class MainViewModel
     
     public MainViewModel(SettingsService settingsService, IMovieProvider movieProvider)
     {
-        AddTab("Еженедельный отчет", new WeeklyReportView());
+        AddTab("Еженедельный отчет", new ReportView(new CompositeReportService([new WeeklyRentalsReportService()])));
         AddTab("Ежемесячный отчет", new ReportView(new CompositeReportService([new MonthlyReportService(settingsService, movieProvider), new MonthlyPaymentReportService()])));
         AddTab("Ежеквартальный отчет", new ReportView(new QuarterlyReportService(settingsService)));
     }

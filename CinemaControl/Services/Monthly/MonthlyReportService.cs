@@ -27,9 +27,13 @@ public class MonthlyReportService(SettingsService settingsService, IMovieProvide
         var reportProvider = new PeriodReportProvider(from, to);
         var download = await reportProvider.DownloadReport(page, frame, ReportSaveType.Excel);
         await download.SaveAsAsync(newFilePath);
+        
+        ProgressDownload();
 
         var grossMovieData = ParseGrossMovieData(newFilePath);
         await FillMonthlyReport(grossMovieData, from, to, page);
+        
+        ProgressDownload();
 
         return sessionPath;
     }

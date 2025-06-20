@@ -9,7 +9,9 @@ public abstract class ReportService : IReportService
     
     private const string UserNameSelector = "input[name=\"UserName\"]";
     private const string LogInSelector = "input[type=\"submit\"]";
-    
+
+    public event Action? OnDownloadProgress;
+
     public string GetSessionPath(DateTime startDate, DateTime endDate)
     {
         var reportsRootPath = Path.Combine(Path.GetTempPath(), ReportsRootPath);
@@ -31,4 +33,9 @@ public abstract class ReportService : IReportService
     }
 
     public abstract Task<string> GenerateReportFiles(DateTime from, DateTime to, IPage page);
+
+    protected void ProgressDownload()
+    {
+        OnDownloadProgress?.Invoke();
+    }
 }

@@ -21,6 +21,8 @@ public class MonthlyPaymentReportService : ReportService
         var download = await reportProvider.DownloadReport(page, frame, ReportSaveType.Pdf);
         await download.SaveAsAsync(newFilePath);
         
+        ProgressDownload();
+        
         return sessionPath;
     }
 }
