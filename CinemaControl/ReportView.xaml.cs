@@ -7,6 +7,7 @@ using CinemaControl.Services;
 using Microsoft.Playwright;
 using ClosedXML.Excel;
 using System.Data;
+using CinemaControl.ViewModel;
 
 namespace CinemaControl;
 
@@ -22,7 +23,7 @@ public partial class ReportView
         // Clear placeholder items
         DownloadedFilesListBox.Items.Clear();
         InitializeWebView();
-        OpenFolderIcon.Visibility = Visibility.Collapsed;
+        DataContext = new ReportViewModel(reportService);
     }
 
     private async void InitializeWebView()
@@ -50,7 +51,6 @@ public partial class ReportView
         IsEnabled = false;
         DownloadedFilesListBox.Items.Clear();
         _currentReportFolderPath = null;
-        OpenFolderIcon.Visibility = Visibility.Collapsed;
 
         try
         {
@@ -73,7 +73,6 @@ public partial class ReportView
 
             if (DownloadedFilesListBox.Items.Count > 0)
             {
-                OpenFolderIcon.Visibility = Visibility.Visible;
             }
         }
         catch (Exception ex)
