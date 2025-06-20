@@ -123,7 +123,7 @@ public class ReportViewModel(IReportService reportService) : INotifyPropertyChan
             return;
         }
 
-        if (_to > _from)
+        if (_from > _to)
         {
             MessageBox.Show("Начальная дата не может быть позже конечной.", "Ошибка валидации", MessageBoxButton.OK, MessageBoxImage.Error);
             return;
