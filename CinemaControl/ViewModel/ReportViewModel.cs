@@ -136,7 +136,11 @@ public class ReportViewModel(IReportService reportService) : INotifyPropertyChan
             using var playwright = await Playwright.CreateAsync();
             await using var browser = await playwright.Chromium.LaunchAsync(new() { Headless = true });
             var page = await browser.NewPageAsync();
-            reportService.OnDownloadProgress += () => UpdateReportsCommand.Execute(null);
+            reportService.OnDownloadProgress += () =>
+            {
+                MessageBox.Show("Test");
+                Reports = new ObservableCollection<ListBoxItem>(GetCurrentReports());
+            };
             await reportService.GenerateReportFiles(_from.Value, _to.Value, page);
         }
         catch (Exception ex)
