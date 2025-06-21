@@ -108,9 +108,9 @@ public partial class ReportView : INotifyPropertyChanged
         {
             Reports = new ObservableCollection<ListBoxItem>(GetCurrentReports());
         }
-        catch (Exception exception)
+        catch (Exception ex)
         {
-            MessageBox.Show(exception.Message);
+            MessageBox.Show(ex.Message);
             throw;
         }
     }
