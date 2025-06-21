@@ -10,12 +10,14 @@ using CinemaControl.Services;
 using Microsoft.Playwright;
 using System.Runtime.CompilerServices;
 using CinemaControl.View;
+using Microsoft.Extensions.Logging;
 
 namespace CinemaControl;
 
 public partial class ReportView : INotifyPropertyChanged
 {
     private readonly IReportService _reportService;
+    private readonly ILogger<ReportView> _logger;
     private readonly ImmutableDictionary<string, IPreviewRenderer> _previewRenderers;
 
     #region Properties
@@ -66,11 +68,12 @@ public partial class ReportView : INotifyPropertyChanged
 
     #endregion
     
-    public ReportView(IReportService reportService)
+    public ReportView(IReportService reportService, ILogger<ReportView> logger)
     {
         InitializeComponent();
         DataContext = this;
         _reportService = reportService;
+        _logger = logger;
         _previewRenderers = new Dictionary<string, IPreviewRenderer>
         {
             {".pdf", new PdfPreviewRenderer(WebView) },
@@ -117,6 +120,7 @@ public partial class ReportView : INotifyPropertyChanged
         catch (Exception ex)
         {
             MessageBox.Show($"Не удалось открыть папку: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            _logger.LogError(ex, "Не удалость открыть папку");
         }
     }
     
@@ -135,6 +139,7 @@ public partial class ReportView : INotifyPropertyChanged
         catch (Exception ex)
         {
             MessageBox.Show($"Не удалось загрузить предпросмотр файла: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            _logger.LogError(ex, "Не удалость загрузить предпросмотр файла");
         }
     }
 
@@ -144,7 +149,7 @@ public partial class ReportView : INotifyPropertyChanged
         OpenFile(filePath);
     }
 
-    private static void OpenFile(string? filePath)
+    private void OpenFile(string? filePath)
     {
         if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath)) return;
 
@@ -155,6 +160,7 @@ public partial class ReportView : INotifyPropertyChanged
         catch (Exception ex)
         {
             MessageBox.Show($"Не удалось открыть файл: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            _logger.LogError(ex, "Не удалость открыть файл");
         }
     }
 
@@ -185,6 +191,7 @@ public partial class ReportView : INotifyPropertyChanged
         catch (Exception ex)
         {
             MessageBox.Show($"Произошла ошибка при формировании отчета: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            _logger.LogError(ex, "Произошла ошибка при формировании отчета");
         }
         finally
         {

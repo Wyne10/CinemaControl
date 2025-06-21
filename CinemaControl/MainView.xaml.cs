@@ -6,6 +6,7 @@ using CinemaControl.Services;
 using CinemaControl.Services.Monthly;
 using CinemaControl.Services.Quarterly;
 using CinemaControl.Services.Weekly;
+using Microsoft.Extensions.Logging;
 
 namespace CinemaControl;
 
@@ -14,13 +15,13 @@ public partial class MainView
 {
     public ObservableCollection<TabItem> Tabs { get; } = [];
 
-    public MainView(SettingsService settingsService, IMovieProvider movieProvider)
+    public MainView(SettingsService settingsService, IMovieProvider movieProvider, ILogger<ReportView> logger)
     {
         InitializeComponent();
         DataContext = this;
-        AddTab("Еженедельный отчет", new ReportView(new CompositeReportService([new WeeklyRentalsReportService(), new WeeklyCashierReportService(), new WeeklyCardReportService()])));
-        AddTab("Ежемесячный отчет", new ReportView(new CompositeReportService([new MonthlyReportService(settingsService, movieProvider), new MonthlyPaymentReportService()])));
-        AddTab("Ежеквартальный отчет", new ReportView(new QuarterlyReportService(settingsService)));
+        AddTab("Еженедельный отчет", new ReportView(new CompositeReportService([new WeeklyRentalsReportService(), new WeeklyCashierReportService(), new WeeklyCardReportService()]), logger));
+        AddTab("Ежемесячный отчет", new ReportView(new CompositeReportService([new MonthlyReportService(settingsService, movieProvider), new MonthlyPaymentReportService()]), logger));
+        AddTab("Ежеквартальный отчет", new ReportView(new QuarterlyReportService(settingsService), logger));
     }
 
     private void AddTab(string header, UserControl reportView)

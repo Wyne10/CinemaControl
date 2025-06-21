@@ -13,40 +13,26 @@ public partial class App
 
     public App()
     {
-        try
-        {
-            _appHost = Host.CreateDefaultBuilder()
-                .ConfigureLogging((_, logging) =>
-                {
-                    logging.AddLog4Net("log4net.config");
-                    logging.SetMinimumLevel(LogLevel.Information);
-                })
-                .ConfigureServices((_, services) =>
-                {
-                    services.AddSingleton<SettingsService>();
-                    services.AddSingleton<IMovieProvider, MovieProvider>();
-                    services.AddSingleton<MainView>();
-                })
-                .Build();
-        }
-        catch (Exception e)
-        {
-            MessageBox.Show(e.Message);
-        }
+        _appHost = Host.CreateDefaultBuilder()
+            .ConfigureLogging((_, logging) =>
+            {
+                logging.ClearProviders();
+                logging.AddLog4Net("log4net.config");
+                logging.SetMinimumLevel(LogLevel.Information);
+            })
+            .ConfigureServices((_, services) =>
+            {
+                services.AddSingleton<SettingsService>();
+                services.AddSingleton<IMovieProvider, MovieProvider>();
+                services.AddSingleton<MainView>();
+            })
+            .Build();
     }
 
     private async void OnStartup(object sender, StartupEventArgs e)
     {
-        try
-        {
-            var logger = _appHost.Services.GetRequiredService<ILogger<App>>();
-            logger.LogInformation("Application starting...");
-        }
-        catch (Exception exception)
-        {
-            MessageBox.Show(exception.Message);
-        }
-
+        var logger = _appHost.Services.GetRequiredService<ILogger<App>>();
+        logger.LogInformation("Application starting...");
 
         await _appHost.StartAsync();
         _appHost.Services.GetRequiredService<MainView>().Show();
