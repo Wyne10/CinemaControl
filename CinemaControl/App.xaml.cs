@@ -1,6 +1,7 @@
 ﻿using System.Windows;
+using CinemaControl.Configuration;
 using CinemaControl.Providers.Movie;
-using CinemaControl.Services;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -14,15 +15,21 @@ public partial class App
     public App()
     {
         _appHost = Host.CreateDefaultBuilder()
-            .ConfigureLogging((_, logging) =>
+            .ConfigureAppConfiguration((_, config) =>
             {
-                logging.ClearProviders();
-                logging.AddLog4Net("log4net.config");
-                logging.SetMinimumLevel(LogLevel.Information);
+                config.SetBasePath(AppContext.BaseDirectory);
+                config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
             })
-            .ConfigureServices((_, services) =>
+            .ConfigureLogging((_, logger) =>
             {
-                services.AddSingleton<SettingsService>();
+                logger.ClearProviders();
+                logger.AddLog4Net("log4net.config");
+                logger.SetMinimumLevel(LogLevel.Information);
+            })
+            .ConfigureServices((context, services) =>
+            {
+                services.Configure<AppConfiguration>(
+                    context.Configuration.GetRequiredSection("App"));
                 services.AddSingleton<IMovieProvider, MovieProvider>();
                 services.AddSingleton<MainView>();
             })

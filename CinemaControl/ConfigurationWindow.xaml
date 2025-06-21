@@ -1,0 +1,15 @@
+<Window x:Class="CinemaControl.ConfigurationWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Настройки" SizeToContent="WidthAndHeight" WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize">
+    <StackPanel x:Name="ConfigurationStack" Margin="15">
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
+            <Button Content="Сохранить" MinWidth="80" IsDefault="True" Click="Save"/>
+            <Button Content="Отмена" MinWidth="80" IsCancel="True" Margin="10,0,0,0"/>
+        </StackPanel>
+    </StackPanel>
+</Window> 

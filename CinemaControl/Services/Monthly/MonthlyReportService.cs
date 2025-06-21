@@ -1,16 +1,18 @@
 using System.Collections.Immutable;
 using System.IO;
+using CinemaControl.Configuration;
 using CinemaControl.Dtos;
 using CinemaControl.Providers.Movie;
 using CinemaControl.Providers.Report;
 using Microsoft.Playwright;
 using ClosedXML.Excel;
+using Microsoft.Extensions.Options;
 using Xceed.Document.NET;
 using Xceed.Words.NET;
 
 namespace CinemaControl.Services.Monthly;
 
-public class MonthlyReportService(SettingsService settingsService, IMovieProvider movieProvider) : ReportService
+public class MonthlyReportService(IOptions<AppConfiguration> appConfiguration, IMovieProvider movieProvider) : ReportService
 {
     private const string ReportUrl = "http://192.168.0.254/CinemaWeb/Report/Render?path=RentalReports%2FGrossMovieByPeriod";
     private const string CardReportUrl = "http://192.168.0.254/CinemaWeb/Report/Render?path=RentalReports%2FMovieByPeriodPushkin";
@@ -40,7 +42,7 @@ public class MonthlyReportService(SettingsService settingsService, IMovieProvide
 
     private async Task<string> FillMonthlyReport(IReadOnlyCollection<GrossMovieData> grossMovieData, DateTime from, DateTime to, IPage page)
     {
-        var templatePath = settingsService.Settings.MonthlyReportTemplatePath;
+        var templatePath = appConfiguration.Value.ApiToken;
         if (string.IsNullOrWhiteSpace(templatePath))
         {
             throw new Exception("Не установлен путь к шаблону ежемесячного отчета.");

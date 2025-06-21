@@ -3,8 +3,9 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Web;
+using CinemaControl.Configuration;
 using CinemaControl.Dtos;
-using CinemaControl.Services;
+using Microsoft.Extensions.Options;
 
 namespace CinemaControl.Providers.Movie;
 
@@ -13,14 +14,14 @@ public class MovieProvider : IMovieProvider
     private const string ApiBaseUrl = "https://api.kinopoisk.dev/v1.4/movie/search";
     private static readonly HttpClient HttpClient = new();
     
-    private readonly SettingsService _settingsService;
+    private readonly AppConfiguration _appConfiguration;
     
     private readonly string _movieCacheFilePath;
     private readonly Dictionary<string, Dtos.Movie> _movieCache;
 
-    public MovieProvider(SettingsService settingsService)
+    public MovieProvider(IOptions<AppConfiguration> appConfiguration)
     {
-        _settingsService = settingsService;
+        _appConfiguration = appConfiguration.Value;
         var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
         var appFolderPath = Path.Combine(appDataPath, "CinemaControl");
         Directory.CreateDirectory(appFolderPath);
@@ -50,7 +51,7 @@ public class MovieProvider : IMovieProvider
 
     private async Task<Dtos.Movie?> FetchMovieData(string movieName)
     {
-        var apiToken = _settingsService.Settings.ApiToken;
+        var apiToken = _appConfiguration.ApiToken;
         if (string.IsNullOrWhiteSpace(apiToken))
         {
             throw new Exception("Не установлен API токен.");

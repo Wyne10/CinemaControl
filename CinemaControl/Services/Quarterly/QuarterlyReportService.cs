@@ -1,13 +1,15 @@
 ﻿using System.IO;
+using CinemaControl.Configuration;
 using CinemaControl.Dtos;
 using CinemaControl.Providers.Report;
 using CinemaControl.Services.Monthly;
 using ClosedXML.Excel;
+using Microsoft.Extensions.Options;
 using Microsoft.Playwright;
 
 namespace CinemaControl.Services.Quarterly;
 
-public class QuarterlyReportService(SettingsService settingsService) : ReportService
+public class QuarterlyReportService(IOptions<AppConfiguration> appConfiguration) : ReportService
 {
     private const string ReportUrl = "http://192.168.0.254/CinemaWeb/Report/Render?path=RentalReports%2FGrossMovieByPeriod";
     
@@ -36,7 +38,7 @@ public class QuarterlyReportService(SettingsService settingsService) : ReportSer
     
     private string FillQuarterlyReport(IReadOnlyCollection<GrossMovieData> grossMovieData, DateTime from, DateTime to)
     {
-        var templatePath = settingsService.Settings.QuarterlyReportTemplatePath;
+        var templatePath = appConfiguration.Value.ApiToken;
         if (string.IsNullOrWhiteSpace(templatePath))
         {
             throw new Exception("Не установлен путь к шаблону ежеквартального отчета.");
