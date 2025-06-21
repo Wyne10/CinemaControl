@@ -26,8 +26,6 @@ public partial class MainView
         _configuration = configuration;
         try
         {
-            var weeklyReportConfiguration =
-                _configuration.GetRequiredSection("WeeklyReport").Get<WeeklyReportConfiguration>();
             var monthlyReportConfiguration =
                 _configuration.GetRequiredSection("MonthlyReport").Get<MonthlyReportConfiguration>();
             var quarterlyReportConfiguration = _configuration.GetRequiredSection("QuarterlyReport")
