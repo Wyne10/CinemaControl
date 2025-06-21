@@ -17,5 +17,6 @@ public partial class ConfigurationWindow
     private void Save(object sender, RoutedEventArgs e)
     {
         _windowBuilder.SaveConfiguration();
+        DialogResult = true;
     }
 }

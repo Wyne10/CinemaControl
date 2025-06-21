@@ -16,14 +16,14 @@ namespace CinemaControl;
 [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
 public partial class MainView
 {
-    private AppConfigurationWindowBuilder? _configurationWindow;
+    private readonly IOptions<AppConfiguration> _appConfiguration;
     public ObservableCollection<TabItem> Tabs { get; } = [];
 
     public MainView(IOptions<AppConfiguration> appConfiguration, IMovieProvider movieProvider, ILogger<ReportView> logger)
     {
         InitializeComponent();
         DataContext = this;
-        _configurationWindow = new AppConfigurationWindowBuilder(appConfiguration);
+        _appConfiguration = appConfiguration;
         AddTab("Еженедельный отчет", new ReportView(new CompositeReportService([new WeeklyRentalsReportService(), new WeeklyCashierReportService(), new WeeklyCardReportService()]), logger));
         AddTab("Ежемесячный отчет", new ReportView(new CompositeReportService([new MonthlyReportService(appConfiguration, movieProvider), new MonthlyPaymentReportService()]), logger));
         AddTab("Ежеквартальный отчет", new ReportView(new QuarterlyReportService(appConfiguration), logger));
@@ -41,6 +41,6 @@ public partial class MainView
 
     private void OpenSettings(object sender, RoutedEventArgs e)
     {
-        new ConfigurationWindow(_configurationWindow!).ShowDialog();
+        new ConfigurationWindow(new AppConfigurationWindowBuilder(_appConfiguration)).ShowDialog();
     }
 }

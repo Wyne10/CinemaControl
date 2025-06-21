@@ -1,5 +1,3 @@
-using System.IO;
-using System.Text.Json;
 using System.Windows.Controls;
 using Microsoft.Extensions.Options;
 
@@ -16,16 +14,12 @@ public class AppConfigurationWindowBuilder(IOptions<AppConfiguration> configurat
 
     public override void SaveConfiguration()
     {
-        var configFile = Path.Combine(AppContext.BaseDirectory, "appsettings.json");
-        var json = File.ReadAllText(configFile);
-        var jsonSettings = JsonSerializer.Deserialize<Dictionary<string, Dictionary<string, object>>>(json);
+        var jsonSettings = GetConfiguration();
 
-        // Update App section
         if (!jsonSettings.ContainsKey("App"))
             jsonSettings["App"] = new Dictionary<string, object>();
-        jsonSettings["App"]["ApiToken"] = _apiTokenTextBox.Text;
+        jsonSettings["App"]["ApiToken"] = _apiTokenTextBox?.Text ?? "";
 
-        var options = new JsonSerializerOptions { WriteIndented = true };
-        File.WriteAllText(configFile, JsonSerializer.Serialize(jsonSettings, options));
+        WriteConfiguration(jsonSettings);
     }
 }

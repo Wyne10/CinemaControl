@@ -7,15 +7,12 @@
         Title="Cinema Control" Height="700" Width="900">
     <Grid>
         <TabControl SelectedIndex="0" ItemsSource="{Binding Tabs}" Margin="0,0,0,-1"/>
-        <Button x:Name="SettingsButton" 
-                Width="30" Height="30" 
+        <Button Width="30" Height="30" 
                 HorizontalAlignment="Right" VerticalAlignment="Top" 
                 Margin="0,5,5,0"
                 ToolTip="Настройки"
                 Click="OpenSettings">
-            <Image x:Name="OpenFolderIcon"
-                   Width="18" Height="18"
-                   Source="Assets/settings.png"/>
+            <Image Width="18" Height="18" Source="Assets/settings.png"/>
         </Button>
     </Grid>
 </Window>
