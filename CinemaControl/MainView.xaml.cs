@@ -27,7 +27,7 @@ public partial class MainView
         var weeklyReportConfiguration = _configuration.GetRequiredSection("WeeklyReport").Get<WeeklyReportConfiguration>();
         var monthlyReportConfiguration = _configuration.GetRequiredSection("MonthlyReport").Get<MonthlyReportConfiguration>();
         var quarterlyReportConfiguration = _configuration.GetRequiredSection("QuarterlyReport").Get<QuarterlyReportConfiguration>();
-        AddTab("Еженедельный отчет", new ReportView(new CompositeReportService([new WeeklyRentalsReportService(), new WeeklyCashierReportService(), new WeeklyCardReportService()]), new WeeklyReportConfigurationWindowBuilder(weeklyReportConfiguration!), logger));
+        AddTab("Еженедельный отчет", new ReportView(new CompositeReportService([new WeeklyRentalsReportService(), new WeeklyCashierReportService(), new WeeklyCardReportService()]), new WeeklyReportConfigurationWindowBuilder(), logger));
         AddTab("Ежемесячный отчет", new ReportView(new CompositeReportService([new MonthlyReportService(monthlyReportConfiguration!, movieProvider), new MonthlyPaymentReportService()]), new MonthlyReportConfigurationWindowBuilder(monthlyReportConfiguration!), logger));
         AddTab("Ежеквартальный отчет", new ReportView(new QuarterlyReportService(quarterlyReportConfiguration!), new QuarterlyReportConfigurationWindowBuilder(quarterlyReportConfiguration!), logger));
     }
