@@ -1,6 +1,7 @@
 using System.IO;
 using System.Text.Json;
 using System.Windows.Controls;
+using Microsoft.Win32;
 
 namespace CinemaControl.Configuration;
 
@@ -30,6 +31,27 @@ public abstract class ConfigurationWindowBuilder
         var textBox = new TextBox { Text = value };
         window.ConfigurationStack.Children.Add(label);
         window.ConfigurationStack.Children.Add(textBox);
+        return textBox;
+    }
+
+    protected static TextBox AddBrowseTextBox(ConfigurationWindow window, string labelText,
+        OpenFileDialog openFileDialog, string value = "")
+    {
+        var label = new Label { Content = labelText };
+        var textBox = new TextBox { Text = value };
+        var browseButton = new Button { Content = "Обзор...", MaxWidth = 50 };
+        browseButton.Click += (_, _) =>
+        {
+            if (openFileDialog.ShowDialog() == true)
+            {
+                textBox.Text = openFileDialog.FileName;
+            }
+        };
+        var stackPanel = new StackPanel { Orientation = Orientation.Horizontal };
+        stackPanel.Children.Add(textBox);
+        stackPanel.Children.Add(browseButton);
+        window.ConfigurationStack.Children.Add(label);
+        window.ConfigurationStack.Children.Add(stackPanel);
         return textBox;
     }
 }

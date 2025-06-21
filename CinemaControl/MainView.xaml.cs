@@ -10,7 +10,6 @@ using CinemaControl.Services.Quarterly;
 using CinemaControl.Services.Weekly;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace CinemaControl;
 
@@ -20,15 +19,17 @@ public partial class MainView
     private readonly IConfiguration _configuration;
     public ObservableCollection<TabItem> Tabs { get; } = [];
 
-    public MainView(IConfiguration configuration, IOptions<AppConfiguration> appConfiguration, IMovieProvider movieProvider, ILogger<ReportView> logger)
+    public MainView(IConfiguration configuration, IMovieProvider movieProvider, ILogger<ReportView> logger)
     {
         InitializeComponent();
         DataContext = this;
         _configuration = configuration;
-        MessageBox.Show(appConfiguration.Value.ApiToken);
-        AddTab("Еженедельный отчет", new ReportView(new CompositeReportService([new WeeklyRentalsReportService(), new WeeklyCashierReportService(), new WeeklyCardReportService()]), logger));
-        AddTab("Ежемесячный отчет", new ReportView(new CompositeReportService([new MonthlyReportService(appConfiguration, movieProvider), new MonthlyPaymentReportService()]), logger));
-        AddTab("Ежеквартальный отчет", new ReportView(new QuarterlyReportService(appConfiguration), logger));
+        var weeklyReportConfiguration = _configuration.GetRequiredSection("WeeklyReport").Get<WeeklyReportConfiguration>();
+        var monthlyReportConfiguration = _configuration.GetRequiredSection("MonthlyReport").Get<MonthlyReportConfiguration>();
+        var quarterlyReportConfiguration = _configuration.GetRequiredSection("QuarterlyReport").Get<QuarterlyReportConfiguration>();
+        AddTab("Еженедельный отчет", new ReportView(new CompositeReportService([new WeeklyRentalsReportService(), new WeeklyCashierReportService(), new WeeklyCardReportService()]), new WeeklyReportConfigurationWindowBuilder(weeklyReportConfiguration!), logger));
+        AddTab("Ежемесячный отчет", new ReportView(new CompositeReportService([new MonthlyReportService(monthlyReportConfiguration!, movieProvider), new MonthlyPaymentReportService()]), new MonthlyReportConfigurationWindowBuilder(monthlyReportConfiguration!), logger));
+        AddTab("Ежеквартальный отчет", new ReportView(new QuarterlyReportService(quarterlyReportConfiguration!), new QuarterlyReportConfigurationWindowBuilder(quarterlyReportConfiguration!), logger));
     }
 
     private void AddTab(string header, UserControl reportView)
@@ -44,7 +45,6 @@ public partial class MainView
     private void OpenSettings(object sender, RoutedEventArgs e)
     {
         var appConfiguration = _configuration.GetRequiredSection("App").Get<AppConfiguration>();
-        MessageBox.Show(appConfiguration.ApiToken);
-        new ConfigurationWindow(new AppConfigurationWindowBuilder(appConfiguration)).ShowDialog();
+        new ConfigurationWindow(new AppConfigurationWindowBuilder(appConfiguration!)).ShowDialog();
     }
 }

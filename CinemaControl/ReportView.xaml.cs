@@ -9,6 +9,7 @@ using System.Windows.Input;
 using CinemaControl.Services;
 using Microsoft.Playwright;
 using System.Runtime.CompilerServices;
+using CinemaControl.Configuration;
 using CinemaControl.View;
 using Microsoft.Extensions.Logging;
 
@@ -17,6 +18,8 @@ namespace CinemaControl;
 public partial class ReportView : INotifyPropertyChanged
 {
     private readonly IReportService _reportService;
+    private readonly ConfigurationWindowBuilder _configurationWindowBuilder;
+    
     private readonly ILogger<ReportView> _logger;
     private readonly ImmutableDictionary<string, IPreviewRenderer> _previewRenderers;
 
@@ -68,11 +71,12 @@ public partial class ReportView : INotifyPropertyChanged
 
     #endregion
     
-    public ReportView(IReportService reportService, ILogger<ReportView> logger)
+    public ReportView(IReportService reportService, ConfigurationWindowBuilder configurationWindowBuilder, ILogger<ReportView> logger)
     {
         InitializeComponent();
         DataContext = this;
         _reportService = reportService;
+        _configurationWindowBuilder = configurationWindowBuilder;
         _logger = logger;
         _previewRenderers = new Dictionary<string, IPreviewRenderer>
         {
@@ -205,6 +209,11 @@ public partial class ReportView : INotifyPropertyChanged
         {
             IsEnabled = true;
         }
+    }
+
+    private void OpenSettings(object sender, RoutedEventArgs e)
+    {
+        new ConfigurationWindow(_configurationWindowBuilder).ShowDialog();
     }
     
     public event PropertyChangedEventHandler? PropertyChanged;
