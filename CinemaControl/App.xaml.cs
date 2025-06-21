@@ -30,8 +30,17 @@ public partial class App
 
     private async void OnStartup(object sender, StartupEventArgs e)
     {
-        var logger = _appHost.Services.GetRequiredService<ILogger<App>>();
-        logger.LogInformation("Application starting...");
+        try
+        {
+            var logger = _appHost.Services.GetRequiredService<ILogger<App>>();
+            logger.LogInformation("Application starting...");
+        }
+        catch (Exception exception)
+        {
+            MessageBox.Show(exception.Message);
+            throw;
+        }
+
 
         await _appHost.StartAsync();
         _appHost.Services.GetRequiredService<MainView>().Show();
