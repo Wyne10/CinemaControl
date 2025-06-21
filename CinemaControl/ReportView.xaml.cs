@@ -32,6 +32,7 @@ public partial class ReportView : INotifyPropertyChanged
     public ReportView(IReportService reportService)
     {
         InitializeComponent();
+        DataContext = this;
         _reportService = reportService;
         _previewRenderers = new Dictionary<string, IPreviewRenderer>
         {

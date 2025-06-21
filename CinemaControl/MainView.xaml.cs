@@ -17,6 +17,7 @@ public partial class MainView
     public MainView(SettingsService settingsService, IMovieProvider movieProvider)
     {
         InitializeComponent();
+        DataContext = this;
         AddTab("Еженедельный отчет", new ReportView(new CompositeReportService([new WeeklyRentalsReportService(), new WeeklyCashierReportService(), new WeeklyCardReportService()])));
         AddTab("Ежемесячный отчет", new ReportView(new CompositeReportService([new MonthlyReportService(settingsService, movieProvider), new MonthlyPaymentReportService()])));
         AddTab("Ежеквартальный отчет", new ReportView(new QuarterlyReportService(settingsService)));
