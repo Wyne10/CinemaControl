@@ -13,19 +13,26 @@ public partial class App
 
     public App()
     {
-        _appHost = Host.CreateDefaultBuilder()
-            .ConfigureLogging((_, logging) =>
-            {
-                logging.AddLog4Net("log4net.config");
-                logging.SetMinimumLevel(LogLevel.Information);
-            })
-            .ConfigureServices((_, services) =>
-            {
-                services.AddSingleton<SettingsService>();
-                services.AddSingleton<IMovieProvider, MovieProvider>();
-                services.AddSingleton<MainView>();
-            })
-            .Build();
+        try
+        {
+            _appHost = Host.CreateDefaultBuilder()
+                .ConfigureLogging((_, logging) =>
+                {
+                    logging.AddLog4Net("log4net.config");
+                    logging.SetMinimumLevel(LogLevel.Information);
+                })
+                .ConfigureServices((_, services) =>
+                {
+                    services.AddSingleton<SettingsService>();
+                    services.AddSingleton<IMovieProvider, MovieProvider>();
+                    services.AddSingleton<MainView>();
+                })
+                .Build();
+        }
+        catch (Exception e)
+        {
+            MessageBox.Show(e.Message);
+        }
     }
 
     private async void OnStartup(object sender, StartupEventArgs e)
@@ -38,7 +45,6 @@ public partial class App
         catch (Exception exception)
         {
             MessageBox.Show(exception.Message);
-            throw;
         }
 
 
