@@ -25,6 +25,7 @@ public partial class MainView
         InitializeComponent();
         DataContext = this;
         _configuration = configuration;
+        MessageBox.Show(appConfiguration.Value.ApiToken);
         AddTab("Еженедельный отчет", new ReportView(new CompositeReportService([new WeeklyRentalsReportService(), new WeeklyCashierReportService(), new WeeklyCardReportService()]), logger));
         AddTab("Ежемесячный отчет", new ReportView(new CompositeReportService([new MonthlyReportService(appConfiguration, movieProvider), new MonthlyPaymentReportService()]), logger));
         AddTab("Ежеквартальный отчет", new ReportView(new QuarterlyReportService(appConfiguration), logger));
@@ -43,6 +44,7 @@ public partial class MainView
     private void OpenSettings(object sender, RoutedEventArgs e)
     {
         var appConfiguration = _configuration.GetRequiredSection("App").Get<AppConfiguration>();
+        MessageBox.Show(appConfiguration.ApiToken);
         new ConfigurationWindow(new AppConfigurationWindowBuilder(appConfiguration)).ShowDialog();
     }
 }
