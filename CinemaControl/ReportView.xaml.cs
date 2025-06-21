@@ -39,6 +39,7 @@ public partial class ReportView : INotifyPropertyChanged
             {".pdf", new PdfPreviewRenderer(WebView) },
             {".xlsx", new ExcelPreviewRenderer(ExcelDataGrid) }
         }.ToImmutableDictionary();
+        DownloadedFilesListBox.Items.Clear();
     }
 
     private List<ListBoxItem> GetCurrentReports()
