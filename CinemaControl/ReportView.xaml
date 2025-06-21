@@ -39,7 +39,7 @@
                        ToolTip="Открыть папку с отчетами"/>
             </StackPanel>
             
-            <ListBox Grid.Row="2" Name="DownloadedFilesListBox"
+            <ListBox Grid.Row="2" Name="DownloadedFilesListBox" ItemsSource="{Binding Reports}"
                      MouseDoubleClick="OpenReport"
                      SelectionChanged="PreviewReport">
                 <!-- Sample Items -->
