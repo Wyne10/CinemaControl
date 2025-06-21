@@ -3,6 +3,7 @@ using CinemaControl.Providers.Movie;
 using CinemaControl.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace CinemaControl;
 
@@ -13,6 +14,11 @@ public partial class App
     public App()
     {
         _appHost = Host.CreateDefaultBuilder()
+            .ConfigureLogging((_, logging) =>
+            {
+                logging.AddLog4Net("log4net.config");
+                logging.SetMinimumLevel(LogLevel.Information);
+            })
             .ConfigureServices((_, services) =>
             {
                 services.AddSingleton<SettingsService>();
@@ -24,6 +30,9 @@ public partial class App
 
     private async void OnStartup(object sender, StartupEventArgs e)
     {
+        var logger = _appHost.Services.GetRequiredService<ILogger<App>>();
+        logger.LogInformation("Application starting...");
+
         await _appHost.StartAsync();
         _appHost.Services.GetRequiredService<MainView>().Show();
     }
