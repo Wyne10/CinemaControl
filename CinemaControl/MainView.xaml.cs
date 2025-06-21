@@ -24,12 +24,35 @@ public partial class MainView
         InitializeComponent();
         DataContext = this;
         _configuration = configuration;
-        var weeklyReportConfiguration = _configuration.GetRequiredSection("WeeklyReport").Get<WeeklyReportConfiguration>();
-        var monthlyReportConfiguration = _configuration.GetRequiredSection("MonthlyReport").Get<MonthlyReportConfiguration>();
-        var quarterlyReportConfiguration = _configuration.GetRequiredSection("QuarterlyReport").Get<QuarterlyReportConfiguration>();
-        AddTab("Еженедельный отчет", new ReportView(new CompositeReportService([new WeeklyRentalsReportService(), new WeeklyCashierReportService(), new WeeklyCardReportService()]), new WeeklyReportConfigurationWindowBuilder(), logger));
-        AddTab("Ежемесячный отчет", new ReportView(new CompositeReportService([new MonthlyReportService(monthlyReportConfiguration!, movieProvider), new MonthlyPaymentReportService()]), new MonthlyReportConfigurationWindowBuilder(monthlyReportConfiguration!), logger));
-        AddTab("Ежеквартальный отчет", new ReportView(new QuarterlyReportService(quarterlyReportConfiguration!), new QuarterlyReportConfigurationWindowBuilder(quarterlyReportConfiguration!), logger));
+        try
+        {
+            var weeklyReportConfiguration =
+                _configuration.GetRequiredSection("WeeklyReport").Get<WeeklyReportConfiguration>();
+            var monthlyReportConfiguration =
+                _configuration.GetRequiredSection("MonthlyReport").Get<MonthlyReportConfiguration>();
+            var quarterlyReportConfiguration = _configuration.GetRequiredSection("QuarterlyReport")
+                .Get<QuarterlyReportConfiguration>();
+            AddTab("Еженедельный отчет",
+                new ReportView(
+                    new CompositeReportService([
+                        new WeeklyRentalsReportService(), new WeeklyCashierReportService(),
+                        new WeeklyCardReportService()
+                    ]), new WeeklyReportConfigurationWindowBuilder(), logger));
+            AddTab("Ежемесячный отчет",
+                new ReportView(
+                    new CompositeReportService([
+                        new MonthlyReportService(monthlyReportConfiguration!, movieProvider),
+                        new MonthlyPaymentReportService()
+                    ]), new MonthlyReportConfigurationWindowBuilder(monthlyReportConfiguration!), logger));
+            AddTab("Ежеквартальный отчет",
+                new ReportView(new QuarterlyReportService(quarterlyReportConfiguration!),
+                    new QuarterlyReportConfigurationWindowBuilder(quarterlyReportConfiguration!), logger));
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Exception");
+        }
+
     }
 
     private void AddTab(string header, UserControl reportView)
