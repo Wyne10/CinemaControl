@@ -76,7 +76,13 @@ public partial class ReportView : INotifyPropertyChanged
             {".pdf", new PdfPreviewRenderer(WebView) },
             {".xlsx", new ExcelPreviewRenderer(ExcelDataGrid) }
         }.ToImmutableDictionary();
+        InitializeWebView();
         DownloadedFilesListBox.Items.Clear();
+    }
+    
+    private async void InitializeWebView()
+    {
+        await WebView.EnsureCoreWebView2Async(null);
     }
 
     private List<ListBoxItem> GetCurrentReports()
