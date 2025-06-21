@@ -4,7 +4,6 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
-             xmlns:local="clr-namespace:CinemaControl"
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="800">
     <Grid Margin="10">
@@ -25,25 +24,24 @@
 
             <StackPanel Grid.Row="0" Orientation="Vertical">
                 <Label Content="Дата от:"/>
-                <DatePicker Name="FromDatePicker"/>
+                <DatePicker Name="FromDatePicker" SelectedDateChanged="OnSelectedDateChanged"/>
                 <Label Content="Дата до:"/>
-                <DatePicker Name="ToDatePicker"/>
-                <Button Content="Сформировать отчет" Margin="0,10,0,0" Click="GenerateReport_Click"/>
+                <DatePicker Name="ToDatePicker" SelectedDateChanged="OnSelectedDateChanged"/>
+                <Button Content="Сформировать отчет" Margin="0,10,0,0" Click="GenerateReport"/>
             </StackPanel>
 
             <StackPanel Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Center">
                 <Label Content="Скачанные файлы:" VerticalAlignment="Center"/>
-                <Image x:Name="OpenFolderIcon"
-                       Width="16" Height="16" Margin="5,0,0,0"
+                <Image Width="16" Height="16" Margin="5,0,0,0"
                        Source="Assets/folder.png"
                        Cursor="Hand"
-                       MouseLeftButtonUp="OpenReportFolder_Click" 
+                       MouseLeftButtonUp="OpenReportDirectory" 
                        ToolTip="Открыть папку с отчетами"/>
             </StackPanel>
             
-            <ListBox Grid.Row="2" Name="DownloadedFilesListBox" 
-                     MouseDoubleClick="DownloadedFilesListBox_MouseDoubleClick"
-                     SelectionChanged="DownloadedFilesListBox_SelectionChanged">
+            <ListBox Grid.Row="2" Name="DownloadedFilesListBox" ItemsSource="{Binding Reports}"
+                     MouseDoubleClick="OpenReport"
+                     SelectionChanged="PreviewReport">
                 <!-- Sample Items -->
                 <ListBoxItem Content="report_2023-10-23.pdf"/>
                 <ListBoxItem Content="report_2023-10-24.pdf"/>

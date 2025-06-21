@@ -1,24 +1,25 @@
-﻿using System.Windows;
+﻿using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Windows.Controls;
 using CinemaControl.Providers.Movie;
 using CinemaControl.Services;
 using CinemaControl.Services.Monthly;
 using CinemaControl.Services.Quarterly;
+using CinemaControl.Services.Weekly;
 
 namespace CinemaControl;
 
+[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
 public partial class MainView
 {
-    private readonly SettingsService _settingsService;
+    public ObservableCollection<TabItem> Tabs { get; } = [];
 
-    public MainView()
+    public MainView(SettingsService settingsService, IMovieProvider movieProvider)
     {
         InitializeComponent();
-        _settingsService = new SettingsService();
-        var movieProvider = new MovieProvider(_settingsService);
-        AddTab("Еженедельный отчет", new WeeklyReportView());
-        AddTab("Ежемесячный отчет", new ReportView(new CompositeReportService([new MonthlyReportService(_settingsService, movieProvider), new MonthlyPaymentReportService()])));
-        AddTab("Ежеквартальный отчет", new ReportView(new QuarterlyReportService(_settingsService)));
+        AddTab("Еженедельный отчет", new ReportView(new CompositeReportService([new WeeklyRentalsReportService(), new WeeklyCashierReportService(), new WeeklyCardReportService()])));
+        AddTab("Ежемесячный отчет", new ReportView(new CompositeReportService([new MonthlyReportService(settingsService, movieProvider), new MonthlyPaymentReportService()])));
+        AddTab("Ежеквартальный отчет", new ReportView(new QuarterlyReportService(settingsService)));
     }
 
     private void AddTab(string header, UserControl reportView)
@@ -28,15 +29,6 @@ public partial class MainView
             Header = header,
             Content = reportView
         };
-        MainTabControl.Items.Add(tabItem);
-    }
-        
-    private void SettingsButton_Click(object sender, RoutedEventArgs e)
-    {
-        var settingsWindow = new SettingsWindow(_settingsService)
-        {
-            Owner = this
-        };
-        settingsWindow.ShowDialog();
+        Tabs.Add(tabItem);
     }
 }

@@ -1,3 +1,6 @@
+using System.Collections.Immutable;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
@@ -5,32 +8,107 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using CinemaControl.Services;
 using Microsoft.Playwright;
-using ClosedXML.Excel;
-using System.Data;
+using System.Runtime.CompilerServices;
+using CinemaControl.View;
 
 namespace CinemaControl;
 
-public partial class ReportView
+public partial class ReportView : INotifyPropertyChanged
 {
     private readonly IReportService _reportService;
-    private string? _currentReportFolderPath;
-
+    private readonly ImmutableDictionary<string, IPreviewRenderer> _previewRenderers;
+    
+    private ObservableCollection<ListBoxItem>? _reports;
+    public ObservableCollection<ListBoxItem>? Reports
+    {
+        get => _reports;
+        set
+        {
+            _reports = value;
+            OnPropertyChanged();
+        }
+    }
+    
     public ReportView(IReportService reportService)
     {
         InitializeComponent();
         _reportService = reportService;
-        // Clear placeholder items
-        DownloadedFilesListBox.Items.Clear();
-        InitializeWebView();
-        OpenFolderIcon.Visibility = Visibility.Collapsed;
+        _previewRenderers = new Dictionary<string, IPreviewRenderer>
+        {
+            {".pdf", new PdfPreviewRenderer(WebView) },
+            {".xlsx", new ExcelPreviewRenderer(ExcelDataGrid) }
+        }.ToImmutableDictionary();
     }
 
-    private async void InitializeWebView()
+    private List<ListBoxItem> GetCurrentReports()
     {
-        await WebView.EnsureCoreWebView2Async(null);
+        if (FromDatePicker.SelectedDate == null || ToDatePicker.SelectedDate == null) return [];
+        var reportsPath = _reportService.GetSessionPath(FromDatePicker.SelectedDate.Value, ToDatePicker.SelectedDate.Value);
+        if (!Directory.Exists(reportsPath)) return [];
+        var filePaths = Directory.EnumerateFiles(reportsPath);
+        var items = filePaths.OrderBy(p => p).Select(path => new ListBoxItem { Content = Path.GetFileName(path), Tag = path }).ToList();
+        return items;
+    }
+    
+    private void OnSelectedDateChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        Reports = new ObservableCollection<ListBoxItem>(GetCurrentReports());
+    }
+    
+    private void OpenReportDirectory(object sender, MouseButtonEventArgs e)
+    {
+        var reportsPathParent = Path.Combine(Path.GetTempPath(), ReportService.ReportsRootPath);
+        if (FromDatePicker.SelectedDate != null && ToDatePicker.SelectedDate != null)
+        {
+            var reportsPath = _reportService.GetSessionPath(FromDatePicker.SelectedDate.Value, ToDatePicker.SelectedDate.Value);
+            if (Directory.Exists(reportsPath))
+                reportsPathParent = reportsPath;
+        }
+        
+        try
+        {
+            Process.Start(new ProcessStartInfo(reportsPathParent) { UseShellExecute = true });
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Не удалось открыть папку: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+    
+    private void PreviewReport(object sender, SelectionChangedEventArgs e)
+    {
+        foreach (var previewRenderer in _previewRenderers.Values) previewRenderer.Hide();
+        if (DownloadedFilesListBox.SelectedItem is not ListBoxItem selectedItem) return;
+
+        var filePath = selectedItem.Tag as string;
+        if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath)) return;
+
+        var extension = Path.GetExtension(filePath).ToLower();
+        _previewRenderers[extension].Render(filePath);        
     }
 
-    private async void GenerateReport_Click(object sender, RoutedEventArgs e)
+    private void OpenReport(object sender, MouseButtonEventArgs e)
+    {
+        if (DownloadedFilesListBox.SelectedItem is not ListBoxItem selectedItem) return;
+        var filePath = selectedItem.Tag as string;
+        OpenFile(filePath);
+    }
+
+    private static void OpenFile(string? filePath)
+    {
+        if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath)) return;
+
+        try
+        {
+            Process.Start(new ProcessStartInfo(filePath) { UseShellExecute = true });
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Не удалось открыть файл: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    private async void GenerateReport(object sender, RoutedEventArgs e)
     {
         var startDate = FromDatePicker.SelectedDate;
         var endDate = ToDatePicker.SelectedDate;
@@ -48,33 +126,14 @@ public partial class ReportView
         }
 
         IsEnabled = false;
-        DownloadedFilesListBox.Items.Clear();
-        _currentReportFolderPath = null;
-        OpenFolderIcon.Visibility = Visibility.Collapsed;
 
         try
         {
             using var playwright = await Playwright.CreateAsync();
             await using var browser = await playwright.Chromium.LaunchAsync(new() { Headless = true });
             var page = await browser.NewPageAsync();
-            _currentReportFolderPath = await _reportService.GenerateReportFiles(startDate.Value, endDate.Value, page);
-                
-            var filePaths = Directory.EnumerateFiles(_currentReportFolderPath);
-
-            foreach (var path in filePaths.OrderBy(p => p))
-            {
-                var item = new ListBoxItem
-                {
-                    Content = Path.GetFileName(path),
-                    Tag = path // Store full path in Tag
-                };
-                DownloadedFilesListBox.Items.Add(item);
-            }
-
-            if (DownloadedFilesListBox.Items.Count > 0)
-            {
-                OpenFolderIcon.Visibility = Visibility.Visible;
-            }
+            _reportService.OnDownloadProgress += () => Reports = new ObservableCollection<ListBoxItem>(GetCurrentReports());
+            await _reportService.GenerateReportFiles(startDate.Value, endDate.Value, page);
         }
         catch (Exception ex)
         {
@@ -85,104 +144,11 @@ public partial class ReportView
             IsEnabled = true;
         }
     }
-        
-    private void OpenReportFolder_Click(object sender, MouseButtonEventArgs e)
-    {
-        if (!string.IsNullOrEmpty(_currentReportFolderPath) && Directory.Exists(_currentReportFolderPath))
-        {
-            try
-            {
-                Process.Start(new ProcessStartInfo(_currentReportFolderPath) { UseShellExecute = true });
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Не удалось открыть папку: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-    }
-
-    private void HideAllPreviewers()
-    {
-        WebView.Visibility = Visibility.Collapsed;
-        ExcelDataGrid.Visibility = Visibility.Collapsed;
-    }
-
-    private void DownloadedFilesListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        HideAllPreviewers();
-        if (DownloadedFilesListBox.SelectedItem is not ListBoxItem selectedItem) return;
-
-        var filePath = selectedItem.Tag as string;
-        if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath)) return;
-
-        var extension = Path.GetExtension(filePath).ToLowerInvariant();
-
-        try
-        {
-            switch (extension)
-            {
-                case ".pdf":
-                    if (WebView?.CoreWebView2 != null)
-                    {
-                        WebView.Visibility = Visibility.Visible;
-                        WebView.CoreWebView2.Navigate(filePath);
-                    }
-                    break;
-                case ".xlsx":
-                    using (var workbook = new XLWorkbook(filePath))
-                    {
-                        var worksheet = workbook.Worksheets.FirstOrDefault();
-                        if (worksheet == null) return;
-
-                        var dt = new DataTable();
-                        // Создание колонок
-                        foreach (var cell in worksheet.FirstRow().Cells())
-                        {
-                            dt.Columns.Add(cell.Value.ToString());
-                        }
-
-                        // Добавление строк
-                        foreach (var row in worksheet.Rows().Skip(1))
-                        {
-                            var newRow = dt.NewRow();
-                            for (int i = 0; i < dt.Columns.Count; i++)
-                            {
-                                newRow[i] = row.Cell(i + 1).Value.ToString();
-                            }
-                            dt.Rows.Add(newRow);
-                        }
-                        ExcelDataGrid.ItemsSource = dt.DefaultView;
-                    }
-                    ExcelDataGrid.Visibility = Visibility.Visible;
-                    break;
-            }
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show($"Не удалось загрузить предпросмотр файла: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-        }
-    }
-
-    private void DownloadedFilesListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-    {
-        if (DownloadedFilesListBox.SelectedItem is not ListBoxItem selectedItem) return;
-        var filePath = selectedItem.Tag as string;
-        if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath)) return;
-        OpenFile(filePath);
-    }
-
-    private static void OpenFile(string filePath)
-    {
-        if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath)) return;
-        
-        try
-        {
-            Process.Start(new ProcessStartInfo(filePath) { UseShellExecute = true });
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show($"Не удалось открыть файл: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-        }
-    }
     
+    public event PropertyChangedEventHandler? PropertyChanged;
+    private void OnPropertyChanged([CallerMemberName] string prop = "")
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
+    }
+
 }

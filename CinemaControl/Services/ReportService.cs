@@ -5,16 +5,17 @@ namespace CinemaControl.Services;
 
 public abstract class ReportService : IReportService
 {
-    private const string ReportsRootPath = "CinemaControlReports";
+    public const string ReportsRootPath = "CinemaControlReports";
     
     private const string UserNameSelector = "input[name=\"UserName\"]";
     private const string LogInSelector = "input[type=\"submit\"]";
-    
-    protected string GetSessionPath(DateTime startDate, DateTime endDate)
+
+    public event Action? OnDownloadProgress;
+
+    public string GetSessionPath(DateTime startDate, DateTime endDate)
     {
         var reportsRootPath = Path.Combine(Path.GetTempPath(), ReportsRootPath);
         var sessionPath = Path.Combine(reportsRootPath, $"Отчет_{startDate:yyyy-MM-dd}_{endDate:yyyy-MM-dd}");
-        Directory.CreateDirectory(sessionPath); 
         return sessionPath;
     }
 
@@ -32,4 +33,9 @@ public abstract class ReportService : IReportService
     }
 
     public abstract Task<string> GenerateReportFiles(DateTime from, DateTime to, IPage page);
+
+    protected void ProgressDownload()
+    {
+        OnDownloadProgress?.Invoke();
+    }
 }
