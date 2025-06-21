@@ -100,7 +100,15 @@ public partial class ReportView : INotifyPropertyChanged
     
     private void OnSelectedDateChanged(object? sender, SelectionChangedEventArgs e)
     {
-        Reports = new ObservableCollection<ListBoxItem>(GetCurrentReports());
+        try
+        {
+            Reports = new ObservableCollection<ListBoxItem>(GetCurrentReports());
+        }
+        catch (Exception exception)
+        {
+            MessageBox.Show(exception.Message);
+            throw;
+        }
     }
     
     private void OpenReportDirectory(object sender, MouseButtonEventArgs e)
