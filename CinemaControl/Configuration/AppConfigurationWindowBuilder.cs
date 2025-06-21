@@ -1,15 +1,14 @@
 using System.Windows.Controls;
-using Microsoft.Extensions.Options;
 
 namespace CinemaControl.Configuration;
 
-public class AppConfigurationWindowBuilder(IOptions<AppConfiguration> configuration) : ConfigurationWindowBuilder
+public class AppConfigurationWindowBuilder(AppConfiguration configuration) : ConfigurationWindowBuilder
 {
     private TextBox? _apiTokenTextBox;
     
     public override void BuildWindow(ConfigurationWindow window)
     {
-        _apiTokenTextBox = AddTextBox(window, "Api Token", configuration.Value.ApiToken);
+        _apiTokenTextBox = AddTextBox(window, "Api Token", configuration.ApiToken);
     }
 
     public override void SaveConfiguration()
