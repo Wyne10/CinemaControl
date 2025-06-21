@@ -17,6 +17,30 @@ public partial class ReportView : INotifyPropertyChanged
 {
     private readonly IReportService _reportService;
     private readonly ImmutableDictionary<string, IPreviewRenderer> _previewRenderers;
+
+    #region Properties
+
+    private DateTime? _from;
+    public DateTime? From
+    {
+        get => _from;
+        set
+        {
+            _from = value;
+            OnPropertyChanged();
+        }
+    }
+
+    private DateTime? _to;
+    public DateTime? To
+    {
+        get => _to;
+        set
+        {
+            _to = value;
+            OnPropertyChanged();
+        }
+    }
     
     private ObservableCollection<ListBoxItem>? _reports;
     public ObservableCollection<ListBoxItem>? Reports
@@ -28,6 +52,19 @@ public partial class ReportView : INotifyPropertyChanged
             OnPropertyChanged();
         }
     }
+    
+    private ListBoxItem? _selectedReport;
+    public ListBoxItem? SelectedReport
+    {
+        get => _selectedReport;
+        set
+        {
+            _selectedReport = value;
+            OnPropertyChanged();
+        }
+    }
+
+    #endregion
     
     public ReportView(IReportService reportService)
     {
@@ -44,8 +81,8 @@ public partial class ReportView : INotifyPropertyChanged
 
     private List<ListBoxItem> GetCurrentReports()
     {
-        if (FromDatePicker.SelectedDate == null || ToDatePicker.SelectedDate == null) return [];
-        var reportsPath = _reportService.GetSessionPath(FromDatePicker.SelectedDate.Value, ToDatePicker.SelectedDate.Value);
+        if (From == null || To == null) return [];
+        var reportsPath = _reportService.GetSessionPath(From.Value, To.Value);
         if (!Directory.Exists(reportsPath)) return [];
         var filePaths = Directory.EnumerateFiles(reportsPath);
         var items = filePaths.OrderBy(p => p).Select(path => new ListBoxItem { Content = Path.GetFileName(path), Tag = path }).ToList();
@@ -60,9 +97,9 @@ public partial class ReportView : INotifyPropertyChanged
     private void OpenReportDirectory(object sender, MouseButtonEventArgs e)
     {
         var reportsPathParent = Path.Combine(Path.GetTempPath(), ReportService.ReportsRootPath);
-        if (FromDatePicker.SelectedDate != null && ToDatePicker.SelectedDate != null)
+        if (From != null && To != null)
         {
-            var reportsPath = _reportService.GetSessionPath(FromDatePicker.SelectedDate.Value, ToDatePicker.SelectedDate.Value);
+            var reportsPath = _reportService.GetSessionPath(From.Value, To.Value);
             if (Directory.Exists(reportsPath))
                 reportsPathParent = reportsPath;
         }
@@ -80,19 +117,24 @@ public partial class ReportView : INotifyPropertyChanged
     private void PreviewReport(object sender, SelectionChangedEventArgs e)
     {
         foreach (var previewRenderer in _previewRenderers.Values) previewRenderer.Hide();
-        if (DownloadedFilesListBox.SelectedItem is not ListBoxItem selectedItem) return;
 
-        var filePath = selectedItem.Tag as string;
+        var filePath = SelectedReport?.Tag as string;
         if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath)) return;
 
         var extension = Path.GetExtension(filePath).ToLower();
-        _previewRenderers[extension].Render(filePath);        
+        try
+        {
+            _previewRenderers[extension].Render(filePath);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Не удалось загрузить предпросмотр файла: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
     }
 
     private void OpenReport(object sender, MouseButtonEventArgs e)
     {
-        if (DownloadedFilesListBox.SelectedItem is not ListBoxItem selectedItem) return;
-        var filePath = selectedItem.Tag as string;
+        var filePath = SelectedReport?.Tag as string;
         OpenFile(filePath);
     }
 
@@ -112,16 +154,13 @@ public partial class ReportView : INotifyPropertyChanged
 
     private async void GenerateReport(object sender, RoutedEventArgs e)
     {
-        var startDate = FromDatePicker.SelectedDate;
-        var endDate = ToDatePicker.SelectedDate;
-
-        if (startDate == null || endDate == null)
+        if (From == null || To == null)
         {
             MessageBox.Show("Пожалуйста, выберите начальную и конечную даты.", "Ошибка валидации", MessageBoxButton.OK, MessageBoxImage.Error);
             return;
         }
 
-        if (startDate > endDate)
+        if (From > To)
         {
             MessageBox.Show("Начальная дата не может быть позже конечной.", "Ошибка валидации", MessageBoxButton.OK, MessageBoxImage.Error);
             return;
@@ -135,7 +174,7 @@ public partial class ReportView : INotifyPropertyChanged
             await using var browser = await playwright.Chromium.LaunchAsync(new() { Headless = true });
             var page = await browser.NewPageAsync();
             _reportService.OnDownloadProgress += () => Reports = new ObservableCollection<ListBoxItem>(GetCurrentReports());
-            await _reportService.GenerateReportFiles(startDate.Value, endDate.Value, page);
+            await _reportService.GenerateReportFiles(From.Value, To.Value, page);
         }
         catch (Exception ex)
         {

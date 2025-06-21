@@ -24,9 +24,9 @@
 
             <StackPanel Grid.Row="0" Orientation="Vertical">
                 <Label Content="Дата от:"/>
-                <DatePicker Name="FromDatePicker" SelectedDateChanged="OnSelectedDateChanged"/>
+                <DatePicker SelectedDate="{Binding From}" SelectedDateChanged="OnSelectedDateChanged"/>
                 <Label Content="Дата до:"/>
-                <DatePicker Name="ToDatePicker" SelectedDateChanged="OnSelectedDateChanged"/>
+                <DatePicker SelectedDate="{Binding To}" SelectedDateChanged="OnSelectedDateChanged"/>
                 <Button Content="Сформировать отчет" Margin="0,10,0,0" Click="GenerateReport"/>
             </StackPanel>
 
@@ -39,7 +39,8 @@
                        ToolTip="Открыть папку с отчетами"/>
             </StackPanel>
             
-            <ListBox Grid.Row="2" Name="DownloadedFilesListBox" ItemsSource="{Binding Reports}"
+            <ListBox Grid.Row="2" Name="DownloadedFilesListBox" 
+                     ItemsSource="{Binding Reports}" SelectedItem="{Binding SelectedReport}"
                      MouseDoubleClick="OpenReport"
                      SelectionChanged="PreviewReport">
                 <!-- Sample Items -->
