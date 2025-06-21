@@ -5,6 +5,7 @@ using System.Text.Json;
 using System.Web;
 using CinemaControl.Configuration;
 using CinemaControl.Dtos;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace CinemaControl.Providers.Movie;
@@ -15,19 +16,22 @@ public class MovieProvider : IMovieProvider
     private static readonly HttpClient HttpClient = new();
     
     private readonly AppConfiguration _appConfiguration;
+    private readonly ILogger<MovieProvider> _logger;
     
     private readonly string _movieCacheFilePath;
     private readonly Dictionary<string, Dtos.Movie> _movieCache;
 
-    public MovieProvider(IOptions<AppConfiguration> appConfiguration)
+    public MovieProvider(IOptions<AppConfiguration> appConfiguration, ILogger<MovieProvider> logger)
     {
         _appConfiguration = appConfiguration.Value;
+        _logger = logger;
         var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
         var appFolderPath = Path.Combine(appDataPath, "CinemaControl");
         Directory.CreateDirectory(appFolderPath);
         _movieCacheFilePath = Path.Combine(appFolderPath, "movies.json");
             
         _movieCache = LoadMovieCache();
+        _logger.LogInformation("Loaded {MovieCacheCount} movie cache entries", _movieCache.Count);
     }
 
     public async Task<Dictionary<string, Dtos.Movie>> GetMovies(IEnumerable<string> movieNames)
@@ -54,7 +58,7 @@ public class MovieProvider : IMovieProvider
         var apiToken = _appConfiguration.ApiToken;
         if (string.IsNullOrWhiteSpace(apiToken))
         {
-            throw new Exception("Не установлен API токен.");
+            throw new Exception("Не установлен API токен");
         }
 
         var builder = new UriBuilder(ApiBaseUrl);
@@ -77,9 +81,10 @@ public class MovieProvider : IMovieProvider
         var movieDto = searchResult?.Docs?.FirstOrDefault();
         if (movieDto == null)
         {
-            throw new Exception($"Фильм {movieName} не найден.");
+            throw new Exception($"Фильм {movieName} не найден");
         }
 
+        _logger.LogInformation("Fetched movie {MovieName} from API", movieName);
         return movieDto;
     }
 

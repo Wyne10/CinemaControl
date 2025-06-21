@@ -28,7 +28,7 @@ public class ReportProvider : IReportProvider
 
         if (!exportMenuClicked)
         {
-            throw new Exception("Не удалось открыть меню экспорта после нескольких попыток.");
+            throw new Exception("Не удалось открыть меню экспорта после нескольких попыток");
         }
 
         var downloadTask = page.WaitForDownloadAsync();

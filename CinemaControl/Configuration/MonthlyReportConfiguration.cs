@@ -1,6 +1,6 @@
 namespace CinemaControl.Configuration;
 
-public class MonthlyReportConfiguration
+public record MonthlyReportConfiguration
 {
     public required string TemplatePath { get; init; }
 }

@@ -7,7 +7,7 @@
         Title="Настройки" SizeToContent="WidthAndHeight" WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize">
     <StackPanel x:Name="ConfigurationStack" Margin="15">
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0 0 0 10">
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 0 0 10">
             <Button Content="Сохранить" MinWidth="80" IsDefault="True" Click="Save"/>
             <Button Content="Отмена" MinWidth="80" IsCancel="True" Margin="10,0,0,0"/>
         </StackPanel>

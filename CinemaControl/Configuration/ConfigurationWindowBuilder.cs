@@ -38,8 +38,8 @@ public abstract class ConfigurationWindowBuilder
         OpenFileDialog openFileDialog, string value = "")
     {
         var label = new Label { Content = labelText };
-        var textBox = new TextBox { Text = value };
-        var browseButton = new Button { Content = "Обзор...", MaxWidth = 50 };
+        var textBox = new TextBox { Text = value, Width = 300 };
+        var browseButton = new Button { Content = "Обзор...", Width = 50 };
         browseButton.Click += (_, _) =>
         {
             if (openFileDialog.ShowDialog() == true)

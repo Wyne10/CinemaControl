@@ -1,5 +1,5 @@
 namespace CinemaControl.Configuration;
 
-public class WeeklyReportConfiguration
+public record WeeklyReportConfiguration
 {
 }

@@ -180,13 +180,13 @@ public partial class ReportView : INotifyPropertyChanged
     {
         if (From == null || To == null)
         {
-            MessageBox.Show("Пожалуйста, выберите начальную и конечную даты.", "Ошибка валидации", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show("Пожалуйста, выберите начальную и конечную даты", "Ошибка валидации", MessageBoxButton.OK, MessageBoxImage.Error);
             return;
         }
 
         if (From > To)
         {
-            MessageBox.Show("Начальная дата не может быть позже конечной.", "Ошибка валидации", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show("Начальная дата не может быть позже конечной", "Ошибка валидации", MessageBoxButton.OK, MessageBoxImage.Error);
             return;
         }
 

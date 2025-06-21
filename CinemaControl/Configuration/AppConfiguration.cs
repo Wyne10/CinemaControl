@@ -1,6 +1,6 @@
 namespace CinemaControl.Configuration;
 
-public class AppConfiguration
+public record AppConfiguration
 {
     public required string ApiToken { get; init; }
 }
