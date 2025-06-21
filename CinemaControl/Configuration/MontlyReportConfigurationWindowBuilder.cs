@@ -1,9 +1,10 @@
 using System.Windows.Controls;
+using Microsoft.Extensions.Options;
 using Microsoft.Win32;
 
 namespace CinemaControl.Configuration;
 
-public class MonthlyReportConfigurationWindowBuilder(MonthlyReportConfiguration configuration) : ConfigurationWindowBuilder
+public class MonthlyReportConfigurationWindowBuilder(IOptions<MonthlyReportConfiguration> configuration) : ConfigurationWindowBuilder
 {
     private TextBox? _monthlyReportTemplateTextBox;
     
@@ -17,7 +18,7 @@ public class MonthlyReportConfigurationWindowBuilder(MonthlyReportConfiguration 
                 Filter = "Word Documents (*.docx)|*.docx|All files (*.*)|*.*",
                 Title = "Выберите шаблон ежемесячного отчета"
             },
-            configuration.TemplatePath);
+            configuration.Value.TemplatePath);
     }
 
     public override void SaveConfiguration()

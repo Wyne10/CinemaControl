@@ -10,6 +10,7 @@ using CinemaControl.Services.Quarterly;
 using CinemaControl.Services.Weekly;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace CinemaControl;
 
@@ -19,7 +20,7 @@ public partial class MainView
     private readonly IConfiguration _configuration;
     public ObservableCollection<TabItem> Tabs { get; } = [];
 
-    public MainView(IConfiguration configuration, IMovieProvider movieProvider, ILogger<ReportView> logger)
+    public MainView(IConfiguration configuration, IOptions<MonthlyReportConfiguration> mm, IMovieProvider movieProvider, ILogger<ReportView> logger)
     {
         InitializeComponent();
         DataContext = this;
@@ -41,7 +42,7 @@ public partial class MainView
                     new CompositeReportService([
                         new MonthlyReportService(monthlyReportConfiguration!, movieProvider),
                         new MonthlyPaymentReportService()
-                    ]), new MonthlyReportConfigurationWindowBuilder(monthlyReportConfiguration!), logger));
+                    ]), new MonthlyReportConfigurationWindowBuilder(mm), logger));
             AddTab("Ежеквартальный отчет",
                 new ReportView(new QuarterlyReportService(quarterlyReportConfiguration!),
                     new QuarterlyReportConfigurationWindowBuilder(quarterlyReportConfiguration!), logger));
