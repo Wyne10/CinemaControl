@@ -4,15 +4,15 @@ using Microsoft.Web.WebView2.Wpf;
 
 namespace CinemaControl.View;
 
-public class UnsupportedPreviewRenderer(TextBox textBox) : IPreviewRenderer
+public class UnsupportedPreviewRenderer(Label label) : IPreviewRenderer
 {
     public void Render(string filePath)
     {
-        textBox.Visibility = Visibility.Visible;
+        label.Visibility = Visibility.Visible;
     }
 
     public void Hide()
     {
-        textBox.Visibility =  Visibility.Collapsed;
+        label.Visibility =  Visibility.Collapsed;
     }
 }

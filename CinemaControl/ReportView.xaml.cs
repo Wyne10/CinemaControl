@@ -22,6 +22,7 @@ public partial class ReportView : INotifyPropertyChanged
     
     private readonly ILogger<ReportView> _logger;
     private readonly ImmutableDictionary<string, IPreviewRenderer> _previewRenderers;
+    private IPreviewRenderer? _previewRenderer;
 
     #region Properties
 
@@ -139,15 +140,16 @@ public partial class ReportView : INotifyPropertyChanged
     
     private void PreviewReport(object sender, SelectionChangedEventArgs e)
     {
-        foreach (var previewRenderer in _previewRenderers.Values) previewRenderer.Hide();
-
+        _previewRenderer?.Hide();
+        
         var filePath = SelectedReport?.Tag as string;
         if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath)) return;
 
         var extension = Path.GetExtension(filePath).ToLower();
         try
         {
-            _previewRenderers.GetValueOrDefault(extension, new UnsupportedPreviewRenderer(UnsupportedPreview)).Render(filePath);
+            _previewRenderer = _previewRenderers.GetValueOrDefault(extension, new UnsupportedPreviewRenderer(UnsupportedPreview));
+            _previewRenderer.Render(filePath);
         }
         catch (Exception ex)
         {

@@ -61,7 +61,7 @@
                 <Grid>
                     <wv2:WebView2 Name="WebView" Visibility="Collapsed"/>
                     <DataGrid Name="ExcelDataGrid" HeadersVisibility="None" Visibility="Collapsed" IsReadOnly="True" AutoGenerateColumns="True"/>
-                    <TextBox Name="UnsupportedPreview">Предпросмотр не поддерживается</TextBox>
+                    <Label Name="UnsupportedPreview" HorizontalAlignment="Center" VerticalAlignment="Center">Предпросмотр не поддерживается</Label>
                 </Grid>
             </Border>
         </DockPanel>
