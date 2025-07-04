@@ -37,12 +37,10 @@ public class CertificateProvider : ICertificateProvider
 
             for (const row of rows) {
                 const cells = row.querySelectorAll('td');
-                if (cells.length > Math.max(" + ICertificateProvider.MovieNameColumnIndex + ", " + ICertificateProvider.CertificateColumnIndex + @")) {
-                    const movie = cells[" + ICertificateProvider.MovieNameColumnIndex + @"]?.innerText.trim();
-                    const cert = cells[" + ICertificateProvider.CertificateColumnIndex + @"]?.innerText.trim();
-                    if (movie && cert) {
-                        result[movie] = cert;
-                    }
+                const movie = cells[" + ICertificateProvider.MovieNameColumnIndex + @"]?.innerText.trim();
+                const cert = cells[" + ICertificateProvider.CertificateColumnIndex + @"]?.innerText.trim();
+                if (movie && cert) {
+                    result[movie] = cert;
                 }
             }
             return result;
