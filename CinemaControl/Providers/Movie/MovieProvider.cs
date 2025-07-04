@@ -75,8 +75,8 @@ public class MovieProvider : IMovieProvider
         var jsonResponse = await response.Content.ReadAsStringAsync();
         var searchResult = JsonSerializer.Deserialize<SearchResponse>(jsonResponse);
 
-        var movieDto = searchResult?.Docs
-            .Where(movie => !movie.IsSeries)
+        var movieDto = searchResult?.Docs?
+            .Where(movie => !(movie.IsSeries ?? false))
             .OrderByDescending(movie => movie.Year)
             .FirstOrDefault(searchResult.Docs.OrderByDescending(movie => movie.Year).FirstOrDefault());
         if (movieDto == null)

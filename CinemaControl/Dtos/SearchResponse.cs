@@ -6,7 +6,7 @@ namespace CinemaControl.Dtos;
 public record SearchResponse
 {
     [JsonPropertyName("docs")]
-    public required List<Movie> Docs { get; init; }
+    public List<Movie>? Docs { get; init; }
 
     [JsonPropertyName("total")]
     public int Total { get; init; }
@@ -27,49 +27,49 @@ public record Movie
     public int Id { get; init; }
 
     [JsonPropertyName("name")]
-    public required string Name { get; init; }
+    public string? Name { get; init; }
 
     [JsonPropertyName("alternativeName")]
-    public required string AlternativeName { get; init; }
+    public string? AlternativeName { get; init; }
     
     [JsonPropertyName("enName")]
-    public required string EnglishName { get; init; }
+    public string? EnglishName { get; init; }
     
     [JsonPropertyName("type")]
-    public required string Type { get; init; }
+    public string? Type { get; init; }
         
     [JsonPropertyName("year")]
-    public int Year { get; init; }
+    public int? Year { get; init; }
 
     [JsonPropertyName("description")]
-    public required string Description { get; init; }
+    public string? Description { get; init; }
 
     [JsonPropertyName("shortDescription")]
-    public required string ShortDescription { get; init; }
+    public string? ShortDescription { get; init; }
     
     [JsonPropertyName("movieLength")]
-    public int Length { get; init; } 
+    public int? Length { get; init; } 
     
     [JsonPropertyName("ageRating")]
-    public int AgeRating { get; init; } 
+    public int? AgeRating { get; init; } 
         
     [JsonPropertyName("logo")]
-    public required Logo Logo { get; init; }
+    public Logo? Logo { get; init; }
     
     [JsonPropertyName("poster")]
-    public required Poster Poster { get; init; }
+    public Poster? Poster { get; init; }
 
     [JsonPropertyName("rating")]
-    public required Rating Rating { get; init; }
+    public Rating? Rating { get; init; }
 
     [JsonPropertyName("genres")]
-    public required List<Genre> Genres { get; init; }
+    public List<Genre>? Genres { get; init; }
 
     [JsonPropertyName("countries")]
-    public required List<Country> Countries { get; init; }
+    public List<Country>? Countries { get; init; }
     
     [JsonPropertyName("isSeries")]
-    public bool IsSeries { get; init; }  
+    public bool? IsSeries { get; init; }  
     
     public bool IsRussian() => Countries?.Any(c => c.Name == "Россия") ?? false;
 
