@@ -1,6 +1,6 @@
 ﻿using Microsoft.Playwright;
 
-namespace CinemaControl.Services;
+namespace CinemaControl.Reports;
 
 public class CompositeReportService : ReportService
 {
@@ -9,12 +9,12 @@ public class CompositeReportService : ReportService
     public CompositeReportService(IEnumerable<IReportService> reportServices)
     {
         _reportServices = reportServices;
-        foreach (IReportService reportService in _reportServices) reportService.OnDownloadProgress += ProgressDownload;
+        foreach (var reportService in _reportServices) reportService.OnDownloadProgress += ProgressDownload;
     }
     
     public override async Task<string> GenerateReportFiles(DateTime from, DateTime to, IPage page)
     {
-        foreach(IReportService reportService in _reportServices) await reportService.GenerateReportFiles(from, to, page);
+        foreach(var reportService in _reportServices) await reportService.GenerateReportFiles(from, to, page);
         return GetSessionPath(from, to);
     }
 }

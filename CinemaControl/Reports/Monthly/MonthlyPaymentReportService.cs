@@ -2,7 +2,7 @@ using System.IO;
 using CinemaControl.Providers.Report;
 using Microsoft.Playwright;
 
-namespace CinemaControl.Services.Monthly;
+namespace CinemaControl.Reports.Monthly;
 
 public class MonthlyPaymentReportService : ReportService
 {

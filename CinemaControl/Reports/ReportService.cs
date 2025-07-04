@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using Microsoft.Playwright;
 
-namespace CinemaControl.Services;
+namespace CinemaControl.Reports;
 
 public abstract class ReportService : IReportService
 {

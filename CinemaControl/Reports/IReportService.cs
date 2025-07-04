@@ -1,6 +1,6 @@
 ﻿using Microsoft.Playwright;
 
-namespace CinemaControl.Services;
+namespace CinemaControl.Reports;
 
 public interface IReportService
 {

@@ -34,6 +34,17 @@ public abstract class ConfigurationWindowBuilder
         return textBox;
     }
 
+    protected static CheckBox AddCheckBox(ConfigurationWindow window, string labelText, bool value = false)
+    {
+        var label = new Label { Content = labelText };
+        var checkBox = new CheckBox { IsChecked = value };
+        var stackPanel = new StackPanel { Orientation = Orientation.Horizontal };
+        stackPanel.Children.Add(checkBox);
+        stackPanel.Children.Add(label);
+        window.ConfigurationStack.Children.Add(stackPanel);
+        return checkBox;   
+    }
+
     protected static TextBox AddBrowseTextBox(ConfigurationWindow window, string labelText,
         OpenFileDialog openFileDialog, string value = "")
     {

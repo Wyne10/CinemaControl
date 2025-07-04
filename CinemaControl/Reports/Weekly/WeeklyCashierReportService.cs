@@ -2,7 +2,7 @@ using System.IO;
 using CinemaControl.Providers.Report;
 using Microsoft.Playwright;
 
-namespace CinemaControl.Services.Weekly;
+namespace CinemaControl.Reports.Weekly;
 
 public class WeeklyCashierReportService : ReportService
 {

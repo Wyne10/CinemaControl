@@ -6,10 +6,10 @@ using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using CinemaControl.Services;
 using Microsoft.Playwright;
 using System.Runtime.CompilerServices;
 using CinemaControl.Configuration;
+using CinemaControl.Reports;
 using CinemaControl.View;
 using Microsoft.Extensions.Logging;
 
@@ -20,7 +20,9 @@ public partial class ReportView : INotifyPropertyChanged
     private readonly IReportService _reportService;
     private readonly ConfigurationWindowBuilder _configurationWindowBuilder;
     
+    private readonly ConfigurationService _configuration;
     private readonly ILogger<ReportView> _logger;
+    
     private readonly ImmutableDictionary<string, IPreviewRenderer> _previewRenderers;
     private IPreviewRenderer? _previewRenderer;
 
@@ -72,13 +74,14 @@ public partial class ReportView : INotifyPropertyChanged
 
     #endregion
     
-    public ReportView(IReportService reportService, ConfigurationWindowBuilder configurationWindowBuilder, ILogger<ReportView> logger)
+    public ReportView(IReportService reportService, ConfigurationWindowBuilder configurationWindowBuilder, ConfigurationService configuration, ILogger<ReportView> logger)
     {
         InitializeComponent();
         DataContext = this;
         _reportService = reportService;
         _reportService.OnDownloadProgress += () => Reports = new ObservableCollection<ListBoxItem>(GetCurrentReports());
         _configurationWindowBuilder = configurationWindowBuilder;
+        _configuration = configuration;
         _logger = logger;
         _previewRenderers = new Dictionary<string, IPreviewRenderer>
         {
@@ -198,7 +201,7 @@ public partial class ReportView : INotifyPropertyChanged
         try
         {
             using var playwright = await Playwright.CreateAsync();
-            await using var browser = await playwright.Chromium.LaunchAsync(new() { Headless = true });
+            await using var browser = await playwright.Chromium.LaunchAsync(new() { Headless = !_configuration.AppConfiguration.Debug });
             var page = await browser.NewPageAsync();
             await _reportService.GenerateReportFiles(From.Value, To.Value, page);
         }

@@ -1,12 +1,13 @@
 ﻿using System.IO;
 using CinemaControl.Configuration;
 using CinemaControl.Dtos;
+using CinemaControl.Providers.Certificate;
 using CinemaControl.Providers.Report;
-using CinemaControl.Services.Monthly;
+using CinemaControl.Reports.Monthly;
 using ClosedXML.Excel;
 using Microsoft.Playwright;
 
-namespace CinemaControl.Services.Quarterly;
+namespace CinemaControl.Reports.Quarterly;
 
 public class QuarterlyReportService(ConfigurationService configuration) : ReportService
 {
@@ -28,14 +29,14 @@ public class QuarterlyReportService(ConfigurationService configuration) : Report
         ProgressDownload();
         
         var grossMovieData = MonthlyReportService.ParseGrossMovieData(newFilePath);
-        FillQuarterlyReport(grossMovieData, from, to);
+        FillQuarterlyReport(grossMovieData, from, to, page);
 
         ProgressDownload();
         
         return sessionPath;
     } 
     
-    private string FillQuarterlyReport(IReadOnlyCollection<GrossMovieData> grossMovieData, DateTime from, DateTime to)
+    private async Task<string> FillQuarterlyReport(IReadOnlyCollection<GrossMovieData> grossMovieData, DateTime from, DateTime to, IPage page)
     {
         var templatePath = configuration.QuarterlyReportConfiguration.TemplatePath;
         if (string.IsNullOrWhiteSpace(templatePath))
@@ -45,6 +46,7 @@ public class QuarterlyReportService(ConfigurationService configuration) : Report
 
         using var workbook = new XLWorkbook(templatePath);
         var worksheet = workbook.Worksheets.First();
+        var certificates = await new CertificateProvider().GetCertificates(page, grossMovieData.Select(data => data.MovieName).ToList());
 
         worksheet.Row(12).Cell("C").Value = from.ToString("dd.MM.yy");
         worksheet.Row(12).Cell("E").Value = to.ToString("dd.MM.yy");
@@ -59,6 +61,7 @@ public class QuarterlyReportService(ConfigurationService configuration) : Report
 
             row.Cell("A").Value = currentRowNumber - 14;
             row.Cell("B").Value = $"{movieData.MovieName} {movieData.ScreenType}";
+            row.Cell("F").Value = certificates.GetValueOrDefault(movieData.MovieName, string.Empty);
             row.Cell("G").Value = movieData.SessionCount;
             row.Cell("H").Value = movieData.ViewerCount;
             row.Cell("I").Value = movieData.Gross;

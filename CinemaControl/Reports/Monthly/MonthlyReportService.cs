@@ -4,12 +4,12 @@ using CinemaControl.Configuration;
 using CinemaControl.Dtos;
 using CinemaControl.Providers.Movie;
 using CinemaControl.Providers.Report;
-using Microsoft.Playwright;
 using ClosedXML.Excel;
+using Microsoft.Playwright;
 using Xceed.Document.NET;
 using Xceed.Words.NET;
 
-namespace CinemaControl.Services.Monthly;
+namespace CinemaControl.Reports.Monthly;
 
 public class MonthlyReportService(ConfigurationService configuration, IMovieProvider movieProvider) : ReportService
 {

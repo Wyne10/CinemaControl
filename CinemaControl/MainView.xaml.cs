@@ -3,10 +3,10 @@ using System.Windows;
 using System.Windows.Controls;
 using CinemaControl.Configuration;
 using CinemaControl.Providers.Movie;
-using CinemaControl.Services;
-using CinemaControl.Services.Monthly;
-using CinemaControl.Services.Quarterly;
-using CinemaControl.Services.Weekly;
+using CinemaControl.Reports;
+using CinemaControl.Reports.Monthly;
+using CinemaControl.Reports.Quarterly;
+using CinemaControl.Reports.Weekly;
 using Microsoft.Extensions.Logging;
 
 namespace CinemaControl;
@@ -28,16 +28,16 @@ public partial class MainView
                 new ReportView(
                     new CompositeReportService([
                         new WeeklyRentalsReportService(), new WeeklyCashierReportService(), new WeeklyCardReportService()
-                    ]), new WeeklyReportConfigurationWindowBuilder(), logger));
+                    ]), new WeeklyReportConfigurationWindowBuilder(), configuration, logger));
             AddTab("Ежемесячный отчет",
                 new ReportView(
                     new CompositeReportService([
                         new MonthlyReportService(configuration, movieProvider), new MonthlyPaymentReportService()
-                    ]), new MonthlyReportConfigurationWindowBuilder(configuration), logger));
+                    ]), new MonthlyReportConfigurationWindowBuilder(configuration), configuration, logger));
             AddTab("Ежеквартальный отчет",
                 new ReportView(
                     new QuarterlyReportService(configuration),
-                    new QuarterlyReportConfigurationWindowBuilder(configuration), logger));
+                    new QuarterlyReportConfigurationWindowBuilder(configuration), configuration, logger));
         }
         catch (Exception ex)
         {
