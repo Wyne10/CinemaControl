@@ -30,27 +30,18 @@ public class CertificateProvider : ICertificateProvider
 
     private async Task<Dictionary<string, string>> ParseTable(ILocator table)
     {
-        var script = $@"
-        (table) => {{
-            const result = {{}};
-            const rows = table.querySelectorAll('tbody tr');
+        var certificates = new Dictionary<string, string>();
+        var rows = await table.Locator("tr").AllAsync();
 
-            for (let i = 1; i < rows.length; i++) {{ // skip header row
-                const cells = rows[i].querySelectorAll('td');
+        foreach (var row in rows.Skip(1))
+        {
+            var cells = await row.Locator("td").AllAsync();
 
-                const movie = cells[{ICertificateProvider.MovieNameColumnIndex}]?.innerText?.trim();
-                const cert = cells[{ICertificateProvider.CertificateColumnIndex}]?.innerText?.trim();
+            var movieName = await cells[ICertificateProvider.MovieNameColumnIndex].InnerTextAsync();
+            var certificate = await cells[ICertificateProvider.CertificateColumnIndex].InnerTextAsync();
+            certificates[movieName.Trim()] = certificate.Trim();
+        }
 
-                if (movie && cert) {{
-                    result[movie] = cert;
-                }}
-            }}
-
-            return result;
-        }}
-    ";
-        
-        var certificates = await table.EvaluateAsync<Dictionary<string, string>>(script);
-        return certificates ?? new Dictionary<string, string>();
+        return certificates;
     }
 }
