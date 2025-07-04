@@ -9,7 +9,7 @@ public class CertificateProvider : ICertificateProvider
         var certificates = new Dictionary<string, string>();
         
         await page.GotoAsync(ICertificateProvider.MovieArchiveUrl);
-        var tableLocator = page.Locator(ICertificateProvider.TableSelector).Nth(1);
+        var tableLocator = page.Locator(ICertificateProvider.TableSelector).Nth(2);
         
         foreach (var certificate in await ParseTable(tableLocator))
             certificates[certificate.Key] = certificate.Value;
@@ -33,13 +33,13 @@ public class CertificateProvider : ICertificateProvider
         var certificates = new Dictionary<string, string>();
         var rows = await table.Locator("tr").AllAsync();
 
-        foreach (var row in rows)
+        foreach (var row in rows.Skip(1))
         {
             var cells = await row.Locator("td").AllAsync();
 
             var movieName = await cells[ICertificateProvider.MovieNameColumnIndex].InnerTextAsync();
             var certificate = await cells[ICertificateProvider.CertificateColumnIndex].InnerTextAsync();
-            certificates[movieName] = certificate;
+            certificates[movieName.Trim()] = certificate.Trim();
         }
 
         return certificates;
