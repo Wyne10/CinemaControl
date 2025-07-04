@@ -76,6 +76,7 @@ public partial class ReportView : INotifyPropertyChanged
         InitializeComponent();
         DataContext = this;
         _reportService = reportService;
+        _reportService.OnDownloadProgress += () => Reports = new ObservableCollection<ListBoxItem>(GetCurrentReports());
         _configurationWindowBuilder = configurationWindowBuilder;
         _logger = logger;
         _previewRenderers = new Dictionary<string, IPreviewRenderer>
@@ -146,7 +147,7 @@ public partial class ReportView : INotifyPropertyChanged
         var extension = Path.GetExtension(filePath).ToLower();
         try
         {
-            _previewRenderers[extension].Render(filePath);
+            _previewRenderers.GetValueOrDefault(extension, new UnsupportedPreviewRenderer(UnsupportedPreview)).Render(filePath);
         }
         catch (Exception ex)
         {
@@ -197,7 +198,6 @@ public partial class ReportView : INotifyPropertyChanged
             using var playwright = await Playwright.CreateAsync();
             await using var browser = await playwright.Chromium.LaunchAsync(new() { Headless = true });
             var page = await browser.NewPageAsync();
-            _reportService.OnDownloadProgress += () => Reports = new ObservableCollection<ListBoxItem>(GetCurrentReports());
             await _reportService.GenerateReportFiles(From.Value, To.Value, page);
         }
         catch (Exception ex)
