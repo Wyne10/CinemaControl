@@ -47,9 +47,7 @@ public class MovieProvider : IMovieProvider
 
     private async Task<Dtos.Movie?> GetMovie(string movieName)
     {
-        if (_movieCache.TryGetValue(movieName, out var movie))
-            return movie;
-        return WriteMovieCache(movieName, await FetchMovieData(movieName));
+        return _movieCache.TryGetValue(movieName, out var movie) ? movie : WriteMovieCache(movieName, await FetchMovieData(movieName));
     }
 
     private async Task<Dtos.Movie?> FetchMovieData(string movieName)
@@ -63,7 +61,7 @@ public class MovieProvider : IMovieProvider
         var builder = new UriBuilder(ApiBaseUrl);
         var query = HttpUtility.ParseQueryString(builder.Query);
         query["page"] = "1";
-        query["limit"] = "1";
+        query["limit"] = "10";
         query["query"] = movieName;
         builder.Query = query.ToString();
             
@@ -77,7 +75,10 @@ public class MovieProvider : IMovieProvider
         var jsonResponse = await response.Content.ReadAsStringAsync();
         var searchResult = JsonSerializer.Deserialize<SearchResponse>(jsonResponse);
 
-        var movieDto = searchResult?.Docs?.FirstOrDefault();
+        var movieDto = searchResult?.Docs
+            .Where(movie => !movie.IsSeries)
+            .OrderByDescending(movie => movie.Year)
+            .FirstOrDefault(searchResult.Docs.OrderByDescending(movie => movie.Year).FirstOrDefault());
         if (movieDto == null)
         {
             throw new Exception($"Фильм {movieName} не найден");
