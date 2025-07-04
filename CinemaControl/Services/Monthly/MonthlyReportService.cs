@@ -11,7 +11,7 @@ using Xceed.Words.NET;
 
 namespace CinemaControl.Services.Monthly;
 
-public class MonthlyReportService(MonthlyReportConfiguration configuration, IMovieProvider movieProvider) : ReportService
+public class MonthlyReportService(ConfigurationService configuration, IMovieProvider movieProvider) : ReportService
 {
     private const string ReportUrl = "http://192.168.0.254/CinemaWeb/Report/Render?path=RentalReports%2FGrossMovieByPeriod";
     private const string CardReportUrl = "http://192.168.0.254/CinemaWeb/Report/Render?path=RentalReports%2FMovieByPeriodPushkin";
@@ -41,7 +41,7 @@ public class MonthlyReportService(MonthlyReportConfiguration configuration, IMov
 
     private async Task<string> FillMonthlyReport(IReadOnlyCollection<GrossMovieData> grossMovieData, DateTime from, DateTime to, IPage page)
     {
-        var templatePath = configuration.TemplatePath;
+        var templatePath = configuration.MonthlyReportConfiguration.TemplatePath;
         if (string.IsNullOrWhiteSpace(templatePath))
         {
             throw new Exception("Не установлен путь к шаблону ежемесячного отчета.");

@@ -34,6 +34,7 @@ public partial class App
                     context.Configuration.GetRequiredSection("MonthlyReport"));
                 services.Configure<QuarterlyReportConfiguration>(
                     context.Configuration.GetRequiredSection("QuarterlyReport"));
+                services.AddSingleton<ConfigurationService>();
                 services.AddSingleton<IMovieProvider, MovieProvider>();
                 services.AddSingleton<MainView>();
             })

@@ -2,13 +2,13 @@ using System.Windows.Controls;
 
 namespace CinemaControl.Configuration;
 
-public class AppConfigurationWindowBuilder(AppConfiguration configuration) : ConfigurationWindowBuilder
+public class AppConfigurationWindowBuilder(ConfigurationService configuration) : ConfigurationWindowBuilder
 {
     private TextBox? _apiTokenTextBox;
     
     public override void BuildWindow(ConfigurationWindow window)
     {
-        _apiTokenTextBox = AddTextBox(window, "Api Token", configuration.ApiToken);
+        _apiTokenTextBox = AddTextBox(window, "Api Token", configuration.AppConfiguration.ApiToken);
     }
 
     public override void SaveConfiguration()

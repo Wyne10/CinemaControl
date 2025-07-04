@@ -3,7 +3,7 @@ using Microsoft.Win32;
 
 namespace CinemaControl.Configuration;
 
-public class QuarterlyReportConfigurationWindowBuilder(QuarterlyReportConfiguration configuration) : ConfigurationWindowBuilder
+public class QuarterlyReportConfigurationWindowBuilder(ConfigurationService configuration) : ConfigurationWindowBuilder
 {
     private TextBox? _quarterlyReportTemplateTextBox;
     
@@ -17,7 +17,7 @@ public class QuarterlyReportConfigurationWindowBuilder(QuarterlyReportConfigurat
                 Filter = "Excel Documents (*.xlsx)|*.xlsx|All files (*.*)|*.*",
                 Title = "Выберите шаблон ежеквартального отчета"
             },
-            configuration.TemplatePath);
+            configuration.QuarterlyReportConfiguration.TemplatePath);
     }
 
     public override void SaveConfiguration()

@@ -1,5 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using System.Diagnostics.CodeAnalysis;
 using System.Windows;
 using System.Windows.Controls;
 using CinemaControl.Configuration;
@@ -8,44 +7,37 @@ using CinemaControl.Services;
 using CinemaControl.Services.Monthly;
 using CinemaControl.Services.Quarterly;
 using CinemaControl.Services.Weekly;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace CinemaControl;
 
-[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
 public partial class MainView
 {
-    private readonly IConfiguration _configuration;
+    private readonly ConfigurationService _configuration;
+    
     public ObservableCollection<TabItem> Tabs { get; } = [];
 
-    public MainView(IConfiguration configuration, IOptions<MonthlyReportConfiguration> mm, IMovieProvider movieProvider, ILogger<ReportView> logger)
+    public MainView(ConfigurationService configuration, IMovieProvider movieProvider, ILogger<ReportView> logger)
     {
         InitializeComponent();
         DataContext = this;
         _configuration = configuration;
         try
         {
-            var monthlyReportConfiguration =
-                _configuration.GetRequiredSection("MonthlyReport").Get<MonthlyReportConfiguration>();
-            var quarterlyReportConfiguration =
-                _configuration.GetRequiredSection("QuarterlyReport").Get<QuarterlyReportConfiguration>();
             AddTab("Еженедельный отчет",
                 new ReportView(
                     new CompositeReportService([
-                        new WeeklyRentalsReportService(), new WeeklyCashierReportService(),
-                        new WeeklyCardReportService()
+                        new WeeklyRentalsReportService(), new WeeklyCashierReportService(), new WeeklyCardReportService()
                     ]), new WeeklyReportConfigurationWindowBuilder(), logger));
             AddTab("Ежемесячный отчет",
                 new ReportView(
                     new CompositeReportService([
-                        new MonthlyReportService(monthlyReportConfiguration!, movieProvider),
-                        new MonthlyPaymentReportService()
-                    ]), new MonthlyReportConfigurationWindowBuilder(mm), logger));
+                        new MonthlyReportService(configuration, movieProvider), new MonthlyPaymentReportService()
+                    ]), new MonthlyReportConfigurationWindowBuilder(configuration), logger));
             AddTab("Ежеквартальный отчет",
-                new ReportView(new QuarterlyReportService(quarterlyReportConfiguration!),
-                    new QuarterlyReportConfigurationWindowBuilder(quarterlyReportConfiguration!), logger));
+                new ReportView(
+                    new QuarterlyReportService(configuration),
+                    new QuarterlyReportConfigurationWindowBuilder(configuration), logger));
         }
         catch (Exception ex)
         {
@@ -65,7 +57,6 @@ public partial class MainView
 
     private void OpenSettings(object sender, RoutedEventArgs e)
     {
-        var appConfiguration = _configuration.GetRequiredSection("App").Get<AppConfiguration>();
-        new ConfigurationWindow(new AppConfigurationWindowBuilder(appConfiguration!)).ShowDialog();
+        new ConfigurationWindow(new AppConfigurationWindowBuilder(_configuration)).ShowDialog();
     }
 }
