@@ -29,7 +29,7 @@ public class QuarterlyReportService(ConfigurationService configuration) : Report
         ProgressDownload();
         
         var grossMovieData = MonthlyReportService.ParseGrossMovieData(newFilePath);
-        FillQuarterlyReport(grossMovieData, from, to, page);
+        await FillQuarterlyReport(grossMovieData, from, to, page);
 
         ProgressDownload();
         
