@@ -28,18 +28,16 @@ public class CertificateProvider : ICertificateProvider
         return certificates;
     }
 
-    private async Task<Dictionary<string, string>> ParseTable(ILocator table)
+    private static async Task<Dictionary<string, string>> ParseTable(ILocator table)
     {
         var certificates = new Dictionary<string, string>();
-        var rows = await table.Locator("tr").AllAsync();
 
-        foreach (var row in rows.Skip(1))
+        var movieNames = await table.Locator($"tr:not(:first-child) td:nth-child({ICertificateProvider.MovieNameColumnIndex + 1})").AllInnerTextsAsync();
+        var certificateValues = await table.Locator($"tr:not(:first-child) td:nth-child({ICertificateProvider.CertificateColumnIndex + 1})").AllInnerTextsAsync();
+        
+        for (var i = 0; i < movieNames.Count; i++)
         {
-            var cells = await row.Locator("td").AllAsync();
-
-            var movieName = await cells[ICertificateProvider.MovieNameColumnIndex].InnerTextAsync();
-            var certificate = await cells[ICertificateProvider.CertificateColumnIndex].InnerTextAsync();
-            certificates[movieName.Trim()] = certificate.Trim();
+            certificates[movieNames[i].Trim()] = certificateValues[i].Trim();
         }
 
         return certificates;
